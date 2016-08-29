@@ -4,9 +4,6 @@ import java.util.LinkedList;
 
 import static board.Move.MoveDirection.*;
 
-/**
- * Created by Juviro on 12.08.2016.
- */
 public class GameState {
 
     /**
@@ -23,27 +20,33 @@ public class GameState {
      *  21  20  19  18  17  16  15    3
      *  14  13  12  11  10   9   8    2
      *   7   6   5   4   3   2   1    1
-     */
-
-
-    /**
+     *
+     *
+     *
      * Number of all bitboards.
      * 0: all bullets
      * 1: red bullets
      * 2: white bullets
      * 3: black bullets
      */
-    public static final int NUMBER_OF_BITMAPS = 4;
+    static final int NUMBER_OF_BITMAPS = 4;
 
-    public static final int NUMBER_OF_FIELDS = 49;
+    static final int NUMBER_OF_FIELDS = 49;
 
 
     public static final int PLAYER_WHITE = 2;
 
     public static final int PLAYER_BLACK = 3;
 
-
+    /**
+     * 2 for white, 3 for black
+     */
     public int activePlayer;
+
+    /**
+     * number of the current turn; starts with 1
+     */
+    public int turn = 0;
 
 
     /**
@@ -56,13 +59,19 @@ public class GameState {
     /**
      * All bitboards representad as array(long).
      */
-    long[] bitmaps;
+    public long[] bitmaps;
 
     /**
      * captured red bullets
      */
-    public int capturedBulletsWhite = 0;
-    public int capturedBulletsBlack = 0;
+    public int capturedBulletsWhite;
+    public int capturedBulletsBlack;
+
+    /**
+     * the last move that has been performed
+     */
+
+    public Move lastMove;
 
     /**
      * Constructor.
@@ -70,14 +79,19 @@ public class GameState {
     public GameState(long[] bitmaps, int startingPlayer) {
         this.bitmaps = bitmaps;
         this.activePlayer = startingPlayer;
+        capturedBulletsBlack = 0;
+        capturedBulletsWhite = 0;
     }
 
     /**
      * copy current gameState
      * @return the copy
      */
-    public GameState copy() {
+    private GameState copy() {
         final GameState newState = new GameState(bitmaps, activePlayer);
+        newState.capturedBulletsBlack = this.capturedBulletsBlack;
+        newState.capturedBulletsWhite = this.capturedBulletsWhite;
+        newState.turn = this.turn;
         return newState;
     }
 
@@ -90,79 +104,78 @@ public class GameState {
 
     public GameState performMove(Move move) {
         GameState newState = this.copy();
-        // after a move, the player switches. If the move was a capture move, the player will switch back
-        switchPlayer();
-        int bulletColor = getColorAtPosition(move.getPositionFrom());
+        newState.turn++;
+        // switch the player after each move (will get switched back if the move was a capture move)
+        newState.switchPlayer();
 
-        // delete bullet from old position
-        newState.bitmaps[bulletColor] ^= move.getPositionFrom();
-        newState.bitmaps[0] ^= move.getPositionFrom();
+        // color of the player that performed the move
+        int bulletColor = getColorAtPosition(move.positionFrom);
 
-        // move all other effected bullets
-        long currentPosition = move.getPositionTo();
-        // the color of the bullet we looked at at the iteration before
-        int colorOfLastBullet = bulletColor;
+        // delete bullet from start position
+        newState.bitmaps[bulletColor] ^= move.positionFrom;
+        newState.bitmaps[0] ^= move.positionFrom;
+
         int colorOfCurrentBullet;
+        int colorOfLastBullet = bulletColor;
 
-        // iterate over every field that may be affected, starting with the field positionTo
-        while(colorOfLastBullet != 0) {
+        long currentPosition = move.positionTo;
+        while(true) {
+            move.affectedBullets++;
             // get the color of the bullet we're looking at
             colorOfCurrentBullet = getColorAtPosition(currentPosition);
 
-            // remove the bullet that was at the position we're looking at
-            newState.bitmaps[colorOfCurrentBullet] = newState.bitmaps[colorOfCurrentBullet] ^= currentPosition;
-
-            // place the bullet at at the position we're looking at
-            newState.bitmaps[colorOfLastBullet] = newState.bitmaps[colorOfLastBullet] |= currentPosition;
-            newState.bitmaps[0] = newState.bitmaps[0] |= currentPosition;
-
-            if (move.getDirection() == UP) {
-                // check if the bullet we're looking at will remain on the board
-                if (Long.numberOfLeadingZeros(currentPosition) < (7 + (64 - 49))) {
-                    if (colorOfCurrentBullet == 1) {
-                        newState.redBulletCaptured(bulletColor);
-                    }
-                    switchPlayer();;
-                }
-                currentPosition <<= 7;
-            } else if (move.getDirection() == DOWN) {
-                // check if the bullet we're looking at will remain on the board
-                if (Long.numberOfLeadingZeros(currentPosition) > (64 - 7)) {
-                    if (colorOfCurrentBullet == 1) {
-                        newState.redBulletCaptured(bulletColor);
-                    }
-                    switchPlayer();
-                }
-                currentPosition >>= 7;
-            } else if (move.getDirection() == LEFT) {
-                // check if the bullet we're looking at will remain on the board
-                if ((Long.numberOfLeadingZeros(currentPosition) - 15) % 7 == 0) {
-                    if (colorOfCurrentBullet == 1) {
-                        newState.redBulletCaptured(bulletColor);
-                    }
-                    switchPlayer();
-                    colorOfCurrentBullet = 0;
-                }
-                currentPosition <<= 1;
-            } else if (move.getDirection() == RIGHT) {
-                // check if the bullet we're looking at will remain on the board
-                if ((Long.numberOfLeadingZeros(currentPosition) - 15) % 7 == 6) {
-                    if (colorOfCurrentBullet == 1) {
-                        newState.redBulletCaptured(bulletColor);
-                    }switchPlayer();
-                    colorOfCurrentBullet = 0;
-                }
-                currentPosition >>= 1;
+            // remove the bullet that was at the position we're looking at (if it had one)
+            if (colorOfCurrentBullet > 0) {
+                newState.bitmaps[colorOfCurrentBullet] = newState.bitmaps[colorOfCurrentBullet] ^= currentPosition;
+            } else {
+                newState.bitmaps[0] = newState.bitmaps[0] |= currentPosition;
             }
 
-            // save the color of the current bullet for the next iteration
+            // place the bullet at at the position we're looking at
+            newState.bitmaps[colorOfLastBullet] |= currentPosition;
+
+            if (isLastField(currentPosition, move.direction)) {
+                if (colorOfCurrentBullet == 1) {
+                    newState.redBulletCaptured(bulletColor);
+                }
+                if (colorOfCurrentBullet >= 1) {
+                    move.isCaptureMove = true;
+                    newState.switchPlayer();
+                }
+                break;
+            } else if (colorOfCurrentBullet == 0) {
+                break;
+            } else {
+                currentPosition = shift(currentPosition, move.direction);
+            }
             colorOfLastBullet = colorOfCurrentBullet;
         }
 
         if (newState.capturedBulletsBlack > 6 || newState.capturedBulletsWhite > 6) {
-            gameWinner = (newState.capturedBulletsBlack > 6 ? 3 : 2);
+            newState.gameWinner = (newState.capturedBulletsBlack > 6 ? 3 : 2);
         }
+        newState.lastMove = move;
         return newState;
+    }
+
+    private long shift(long currentPosition, Move.MoveDirection direction) {
+        switch (direction) {
+            case UP: return currentPosition << 7;
+            case DOWN: return currentPosition >> 7;
+            case LEFT: return currentPosition << 1;
+            case RIGHT: return currentPosition >> 1;
+        }
+        return 0x0L;
+    }
+
+    private boolean isLastField(long position, Move.MoveDirection direction) {
+        switch(direction) {
+            case UP: return (Long.numberOfLeadingZeros(position) <= 21);
+            case DOWN: return (Long.numberOfLeadingZeros(position) >= 56);
+            case LEFT: return ((Long.numberOfLeadingZeros(position) - 15) % 7 == 0);
+            case RIGHT: return ((Long.numberOfLeadingZeros(position) - 15) % 7 == 6);
+        }
+        return false;
     }
 
     /**
@@ -178,17 +191,17 @@ public class GameState {
      */
     private void redBulletCaptured(int color) {
         switch (color) {
-            case 2: capturedBulletsWhite++;break;
-            case 3: capturedBulletsBlack++;break;
+            case 2: this.capturedBulletsWhite++;break;
+            case 3: this.capturedBulletsBlack++;break;
         }
     }
 
     /**
-     * @param color
+     * @param color 2 for white, 3 for black
      * @return all possible moves for the current player
      */
     public LinkedList<Move> getAllMoves(int color) {
-        LinkedList<Move> moves = new LinkedList<Move>();
+        LinkedList<Move> moves = new LinkedList<>();
         long bitboard = bitmaps[color];
         long position = 1;
         while (bitboard != 0) {
@@ -198,24 +211,24 @@ public class GameState {
             bitboard >>= 1;
             position <<= 1;
         }
-        moves.forEach(System.out::println);
+//        moves.forEach(System.out::println);
         return moves;
     }
 
     /**
      * returns a list of all possible moves for one bullet
-     * empty list if no moves are possible
+     * returns an empty list if no moves are possible
      *
      * @param position the position of the bullet
      * @param color    color of the bullet (2: white, 3: black)
-     * @return
+     * @return LinkedList of all possible moves
      */
-    // TODO: remove repititive moves
+    // TODO: check repetitive moves
     private LinkedList<Move> possibleMoves(long position, int color) {
         LinkedList<Move> moves = new LinkedList<>();
         // check up
         //  check if field in the opposite direction is empty
-        if ((position & (bitmaps[0] << 7)) == 0) {
+        if ((position & (bitmaps[0] << 7)) == 0 && noRepetitiveMove(position, UP)) {
             // find the last bullet that would been moved
             long currentPosition = position;
             int lastColor = 0;
@@ -233,7 +246,7 @@ public class GameState {
         }
         // check down
         //  check if field in the opposite direction is empty
-        if ((position & (bitmaps[0] >> 7)) == 0) {
+        if ((position & (bitmaps[0] >> 7)) == 0 && noRepetitiveMove(position, DOWN)) {
             // find the last bullet that would been moved
             long currentPosition = position;
             int lastColor = 0;
@@ -251,7 +264,7 @@ public class GameState {
         }
         // check left
         //  check if field in the opposite direction is empty
-        if (isOnEdge(position, RIGHT) || (bitmaps[0] & (position >> 1)) == 0) {
+        if (isOnEdge(position, RIGHT) || (bitmaps[0] & (position >> 1)) == 0 && noRepetitiveMove(position, LEFT)) {
             // find the last bullet that would been moved
             long currentPosition = position;
             int lastColor = getColorAtPosition(currentPosition);
@@ -265,7 +278,7 @@ public class GameState {
         }
         // check right
         //  check if field in the opposite direction is empty
-        if (isOnEdge(position, LEFT) || (bitmaps[0] & (position << 1)) == 0) {
+        if (isOnEdge(position, LEFT) || (bitmaps[0] & (position << 1)) == 0 && noRepetitiveMove(position, RIGHT)) {
             // find the last bullet that would been moved
             long currentPosition = position;
             int lastColor = getColorAtPosition(currentPosition);
@@ -280,7 +293,27 @@ public class GameState {
         return moves;
     }
 
-    public int getColorAtPosition(long position) {
+    /**
+     * check if a move is repetitive
+     *
+     * @param position position from which the possible move will start
+     * @param direction direction of the possible move
+     * @return true if the move is not repetitive
+     */
+    private boolean noRepetitiveMove(long position, Move.MoveDirection direction) {
+        if (lastMove == null) {
+            return false;
+        }
+        switch(direction){
+            case UP: return !((position << (7 * lastMove.affectedBullets) == lastMove.positionFrom) && lastMove.direction == DOWN);
+            case DOWN: return !((position >> (7 * lastMove.affectedBullets) == lastMove.positionFrom) && lastMove.direction == UP);
+            case LEFT: return !((position << lastMove.affectedBullets == lastMove.positionFrom) && lastMove.direction == RIGHT);
+            case RIGHT: return !((position >> lastMove.affectedBullets == lastMove.positionFrom) && lastMove.direction == LEFT);
+        }
+        return false;
+    }
+
+    private int getColorAtPosition(long position) {
         for (int i = 1; i < NUMBER_OF_BITMAPS; i++) {
             if ((position & bitmaps[i]) != 0) {
                 return i;
@@ -292,11 +325,11 @@ public class GameState {
     /**
      * check if a position is on a specific outer row
      *
-     * @param position
+     * @param position position
      * @param direction 'UP' stands for the top row, and so on
-     * @return
+     * @return true if the position is on the edge of the board
      */
-    public boolean isOnEdge(long position, Move.MoveDirection direction) {
+    private boolean isOnEdge(long position, Move.MoveDirection direction) {
         switch(direction) {
             case UP: return (Long.numberOfLeadingZeros(position) > 15 && Long.numberOfLeadingZeros(position) < 23);
             case DOWN: return (Long.numberOfLeadingZeros(position) > 55);
@@ -309,11 +342,11 @@ public class GameState {
     /**
      * check if a bullet of a give color is on the give position
      *
-     * @param position
-     * @param color
-     * @return
+     * @param position position
+     * @param color 'UP' stands for the top row, and so on
+     * @return true if the position has a bullet of the given color on it
      */
-    public boolean isOnPosition(long position, int color) {
+    boolean isOnPosition(long position, int color) {
         return (position & bitmaps[color]) != 0;
     }
 
@@ -334,12 +367,16 @@ public class GameState {
         System.out.println("");
     }
 
+    /**
+     * prints current stats
+     */
     public void printStats() {
         System.out.println("");
         System.out.println("capturedBulletsWhite = " + capturedBulletsWhite);
         System.out.println("capturedBulletsBlack = " + capturedBulletsBlack);
         System.out.println("activePlayer = " + activePlayer);
         System.out.println("gameWinner = " + gameWinner);
+        System.out.println("lastMove = " + lastMove.toString());
         System.out.println("");
     }
 }

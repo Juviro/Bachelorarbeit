@@ -5,22 +5,11 @@ package board;
  */
 public class Move {
 
-    private long positionFrom;
-    private long positionTo;
-    private MoveDirection direction;
-
-    public long getPositionFrom() {
-        return positionFrom;
-    }
-
-    public long getPositionTo() {
-        return positionTo;
-    }
-
-
-    public MoveDirection getDirection() {
-        return direction;
-    }
+    public long positionFrom;
+    public long positionTo;
+    public MoveDirection direction;
+    public boolean isCaptureMove = false;
+    public int affectedBullets = 0;
 
     public enum MoveDirection {
         UP, DOWN, LEFT, RIGHT
@@ -47,6 +36,7 @@ public class Move {
                 "positionFrom=" + positionFrom +
                 ", positionTo=" + positionTo +
                 ", direction=" + direction +
+                ", isCaptureMove=" + isCaptureMove +
                 '}';
     }
 }
