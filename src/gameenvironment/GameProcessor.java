@@ -11,7 +11,7 @@ import java.util.LinkedList;
 class GameProcessor {
 
     // log the game process
-    private String gameLog = "MoveNr.;activePlayer;fieldString;lastMove\n";
+    private String gameLog = "MoveNr.;activePlayer;fieldString;lastMove;bulletsCapturedWhite;bulletsCapturedBlack\n";
 
     private int gameNumber;
 
@@ -64,11 +64,11 @@ class GameProcessor {
     }
 
     private void logState(GameState gameState) {
-        gameLog += (gameState.turn + 1) + ";" + gameState.activePlayer + ";" + Parser.bitboardToString(gameState.bitmaps) + ";" + Parser.moveToString(gameState.lastMove) + "\n";
+        gameLog += (gameState.turn + 1) + ";" + gameState.activePlayer + ";" + Parser.bitboardToString(gameState.bitmaps) + ";" + Parser.moveToString(gameState.lastMove) + ";" + gameState.capturedBulletsWhite + ";" + gameState.capturedBulletsBlack + "\n";
     }
 
     private void firstLog(String position, int player){
-        gameLog += "1;" + player + ";" + position + ";\n";
+        gameLog += "1;" + player + ";" + position + ";;0;0\n";
     }
 
     private void saveLog() {

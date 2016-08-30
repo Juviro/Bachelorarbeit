@@ -54,11 +54,25 @@ public class GameField extends JPanel {
 		for (int i=0; i<8; i++)
 			for (int j=0; j<8; j++) {
 				if(i == 0 || j % 8 == 7) {
-					GamePlace place = new GamePlace(j, i, false);
+					String fieldChar = "";
+					if(i == 0) {
+						switch (j) {
+							case 0: fieldChar = "a";break;
+							case 1: fieldChar = "b";break;
+							case 2: fieldChar = "c";break;
+							case 3: fieldChar = "d";break;
+							case 4: fieldChar = "e";break;
+							case 5: fieldChar = "f";break;
+							case 6: fieldChar = "g";break;
+						}
+					} else {
+						fieldChar = String.valueOf(i);
+					}
+					GamePlace place = new GamePlace(j, i, false, fieldChar);
 //					field[j][i] = place;
 					gameField.add(place);
 				} else {
-					GamePlace place = new GamePlace(j, i, true);
+					GamePlace place = new GamePlace(j, i, true, "");
 					field[j][i - 1] = place;
 					gameField.add(place);
 				}
@@ -105,12 +119,9 @@ public class GameField extends JPanel {
 		for (int i = 0; i < boardValues.length; i++) {
 			for (int i1 = 0; i1 < boardValues[i].length; i1++) {
 				setBullet(i, i1, boardValues[i][i1]);
-				System.out.print(boardValues[i][i1]);
 				field[i][i1].repaint();
 			}
-			System.out.println("");
 		}
-		System.out.println("\n\n");
 	}
 
 	private void clearAllBullets() {

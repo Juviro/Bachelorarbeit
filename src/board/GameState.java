@@ -13,13 +13,13 @@ public class GameState {
      *
      *  A   B   C   D   E   F   G
      *
-     *  49  48  47  46  45  44  43    7
-     *  42  41  40  39  38  37  36    6
-     *  35  34  33  32  31  30  29    5
+     *  49  48  47  46  45  44  43    1
+     *  42  41  40  39  38  37  36    2
+     *  35  34  33  32  31  30  29    3
      *  28  27  26  25  24  23  22    4
-     *  21  20  19  18  17  16  15    3
-     *  14  13  12  11  10   9   8    2
-     *   7   6   5   4   3   2   1    1
+     *  21  20  19  18  17  16  15    5
+     *  14  13  12  11  10   9   8    6
+     *   7   6   5   4   3   2   1    7
      *
      *
      *
@@ -150,9 +150,9 @@ public class GameState {
             }
             colorOfLastBullet = colorOfCurrentBullet;
         }
-
-        if (newState.capturedBulletsBlack > 6 || newState.capturedBulletsWhite > 6) {
-            newState.gameWinner = (newState.capturedBulletsBlack > 6 ? 3 : 2);
+        // check win conditions (7 red bullets captured or enemy doesn't have bullets on the board remaining
+        if (newState.capturedBulletsBlack > 6 || newState.capturedBulletsWhite > 6 || newState.bitmaps[2] == 0  || newState.bitmaps[3] == 0) {
+            newState.gameWinner = ((newState.capturedBulletsBlack > 6 || newState.bitmaps[2] == 0) ? 3 : 2);
         }
         newState.lastMove = move;
         return newState;
@@ -224,6 +224,7 @@ public class GameState {
      * @return LinkedList of all possible moves
      */
     // TODO: check repetitive moves
+    // TODO: eigene kugeln werden runtergeschmissen; fixed, checken
     private LinkedList<Move> possibleMoves(long position, int color) {
         LinkedList<Move> moves = new LinkedList<>();
         // check up
@@ -267,12 +268,10 @@ public class GameState {
         if (isOnEdge(position, RIGHT) || (bitmaps[0] & (position >> 1)) == 0 && noRepetitiveMove(position, LEFT)) {
             // find the last bullet that would been moved
             long currentPosition = position;
-            int lastColor = getColorAtPosition(currentPosition);
             while (!isOnEdge(currentPosition, LEFT) && getColorAtPosition(currentPosition) != 0) {
-                lastColor = getColorAtPosition(currentPosition);
                 currentPosition <<= 1;
             }
-            if (getColorAtPosition(currentPosition) == 0 || (isOnEdge(currentPosition, LEFT) && lastColor != color)) {
+            if (getColorAtPosition(currentPosition) == 0 || (isOnEdge(currentPosition, LEFT) && getColorAtPosition(currentPosition) != color)) {
                 moves.add(new Move(position, LEFT));
             }
         }
@@ -281,12 +280,10 @@ public class GameState {
         if (isOnEdge(position, LEFT) || (bitmaps[0] & (position << 1)) == 0 && noRepetitiveMove(position, RIGHT)) {
             // find the last bullet that would been moved
             long currentPosition = position;
-            int lastColor = getColorAtPosition(currentPosition);
             while (!isOnEdge(currentPosition, RIGHT) && getColorAtPosition(currentPosition) != 0) {
-                lastColor = getColorAtPosition(currentPosition);
                 currentPosition >>= 1;
             }
-            if (getColorAtPosition(currentPosition) == 0 || (isOnEdge(currentPosition, RIGHT) && lastColor != color)) {
+            if (getColorAtPosition(currentPosition) == 0 || (isOnEdge(currentPosition, RIGHT) && getColorAtPosition(currentPosition) != color)) {
                 moves.add(new Move(position, RIGHT));
             }
         }

@@ -18,7 +18,6 @@ public class GameFrame extends JFrame implements KeyListener{
 	/**
 	 * Status bar at the bottom
 	 */
-	public final GameStatusBar statusBar = new GameStatusBar();
 	/**
 	 * Central area for the game view
 	 */
@@ -50,7 +49,6 @@ public class GameFrame extends JFrame implements KeyListener{
 		Container contentPane = this.getContentPane();
 		contentPane.setLayout(new BorderLayout());
 		contentPane.add(gameView, BorderLayout.CENTER);		
-		contentPane.add(statusBar, BorderLayout.SOUTH);
 
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		

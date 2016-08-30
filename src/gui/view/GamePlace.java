@@ -18,7 +18,8 @@ public class GamePlace extends JPanel {
 	 * coordinates of the place
 	 */
 	final public int posX, posY;
-	
+	private String fieldChar;
+
 	PlaceType placeType = PlaceType.Sand;
 	boolean showShadow = false;
 	boolean showSelection = false;
@@ -32,10 +33,11 @@ public class GamePlace extends JPanel {
 	/**
 	 * Create a new instance with provided X and Y coordinates.
 	 */
-	GamePlace(int posX, int posY, boolean isField) {
+	GamePlace(int posX, int posY, boolean isField, String fieldChar) {
 		this.posX = posX;
 		this.posY = posY;
 		this.isField = isField;
+		this.fieldChar = fieldChar;
 	}
 	
 	/**
@@ -49,7 +51,7 @@ public class GamePlace extends JPanel {
 		if (isField) {
 			paintSand(g);
 		} else {
-			paintChar(g, "f");
+			paintChar(g, this.fieldChar);
 		}
 		addPaintFrame(g);
 
@@ -91,7 +93,7 @@ public class GamePlace extends JPanel {
 	private void paintChar(Graphics g, String string) {
 		int xm = getWidth()/2;
 
-		g.drawString(string, xm/2, xm/2);
-
+		g.setFont(new Font("Dialog", Font.PLAIN, 30));
+		g.drawString(string, (int) (xm/1.5), (int) (1.5 *  xm));
 	}
 }

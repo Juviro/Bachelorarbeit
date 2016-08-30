@@ -43,7 +43,6 @@ public class GameView extends JPanel {
     public void setMoves(String[][] moves) {
         this.moves = moves;
         status.setMoves(moves);
-        System.out.println("moves = " + moves[0][2]);
         field.setBoard(getBoardValues(moves[0][2]));
         field.repaint();
     }
