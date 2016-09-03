@@ -76,9 +76,9 @@ public class GameState {
     /**
      * Constructor.
      */
-    public GameState(long[] bitmaps, int startingPlayer) {
-        this.bitmaps = bitmaps;
-        this.activePlayer = startingPlayer;
+    public GameState(int activePlayer) {
+        bitmaps = new long[NUMBER_OF_BITMAPS];
+        this.activePlayer = activePlayer;
         capturedBulletsBlack = 0;
         capturedBulletsWhite = 0;
     }
@@ -87,8 +87,11 @@ public class GameState {
      * copy current gameState
      * @return the copy
      */
-    private GameState copy() {
-        final GameState newState = new GameState(bitmaps, activePlayer);
+    public GameState copy() {
+        GameState newState = new GameState(activePlayer);
+        for (int i = 0; i < bitmaps.length; i++) {
+            newState.bitmaps[i] = this.bitmaps[i];
+        }
         newState.capturedBulletsBlack = this.capturedBulletsBlack;
         newState.capturedBulletsWhite = this.capturedBulletsWhite;
         newState.turn = this.turn;
@@ -120,6 +123,7 @@ public class GameState {
 
         long currentPosition = move.positionTo;
         while(true) {
+            // counts how many bullets have been moved at this turn
             move.affectedBullets++;
             // get the color of the bullet we're looking at
             colorOfCurrentBullet = getColorAtPosition(currentPosition);
@@ -223,8 +227,8 @@ public class GameState {
      * @param color    color of the bullet (2: white, 3: black)
      * @return LinkedList of all possible moves
      */
-    // TODO: check repetitive moves
-    // TODO: eigene kugeln werden runtergeschmissen; fixed, checken
+    // TODO: check repetitive moves; TODO: junit tests schreiben
+    // TODO: eigene kugeln werden runtergeschmissen; fixed, checken; scheint zu gehen; TODO: junit tests schreiben
     private LinkedList<Move> possibleMoves(long position, int color) {
         LinkedList<Move> moves = new LinkedList<>();
         // check up
@@ -340,7 +344,7 @@ public class GameState {
      * check if a bullet of a give color is on the give position
      *
      * @param position position
-     * @param color 'UP' stands for the top row, and so on
+     * @param color 2 for white, 3 for black
      * @return true if the position has a bullet of the given color on it
      */
     boolean isOnPosition(long position, int color) {
@@ -373,7 +377,9 @@ public class GameState {
         System.out.println("capturedBulletsBlack = " + capturedBulletsBlack);
         System.out.println("activePlayer = " + activePlayer);
         System.out.println("gameWinner = " + gameWinner);
-        System.out.println("lastMove = " + lastMove.toString());
+        if (lastMove != null) {
+            System.out.println("lastMove = " + lastMove.toString());
+        }
         System.out.println("");
     }
 }
