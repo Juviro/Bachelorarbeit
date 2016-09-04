@@ -1,8 +1,7 @@
-package gui.view;
+package gameviewer;
 
 
 import board.Parser;
-import gui.view.GameFrame;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;

@@ -1,7 +1,7 @@
 package gameenvironment;
 
-import ais.DummyAI;
-import ais.NegamaxAI;
+import ais.dummy.DummyAI;
+import ais.negamaxV1.NegamaxAIv1;
 import board.GameState;
 import board.Parser;
 
@@ -15,8 +15,17 @@ class GameProcessor {
 
     private int gameNumber;
 
-    private NegamaxAI negamaxAI = new NegamaxAI();
+    private NegamaxAIv1 negamaxAI = new NegamaxAIv1();
 
+    public int winner = -1;
+
+    /**
+     *Starts a new game with the given options
+     *
+     * @param startingSetup representation of the board as a string
+     * @param whiteStarts true if white starts
+     * @param gameNumber current game number
+     */
     GameProcessor(String startingSetup, boolean whiteStarts, int gameNumber) {
         this.gameNumber = gameNumber;
         long[] bitmaps = createBitmaps(startingSetup);
@@ -36,11 +45,15 @@ class GameProcessor {
                 case 3: gameState = performMoveBlack(gameState); break;
             }
             logState(gameState);
+            if (gameState.turn > 200) {
+                break;
+            }
         }
 
         // save the log as a .csv file
         saveLog();
-        System.out.println("Player " + gameState.gameWinner + " won the Game!");
+        winner = gameState.gameWinner;
+        System.out.println("Player " + winner + " won game " + gameNumber + "!");
     }
 
     /**
@@ -58,7 +71,8 @@ class GameProcessor {
      * @return the new state after the move
      */
     private GameState performMoveBlack(GameState state) {
-        return performMoveDummyKi(state);
+//        return performMoveDummyKi(state);
+        return performMoveNegamaxAI(state);
     }
 
 

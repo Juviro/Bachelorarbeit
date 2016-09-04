@@ -105,7 +105,7 @@ public class GameState {
      * @return new gameState after the move is performed
      */
 
-    public GameState performMove(Move move) {
+    public GameState executeMove(Move move) {
         GameState newState = this.copy();
         newState.turn++;
         // switch the player after each move (will get switched back if the move was a capture move)
@@ -122,6 +122,7 @@ public class GameState {
         int colorOfLastBullet = bulletColor;
 
         long currentPosition = move.positionTo;
+        move.affectedBullets = 0;
         while(true) {
             // counts how many bullets have been moved at this turn
             move.affectedBullets++;
@@ -138,27 +139,31 @@ public class GameState {
             // place the bullet at at the position we're looking at
             newState.bitmaps[colorOfLastBullet] |= currentPosition;
 
-            if (isLastField(currentPosition, move.direction)) {
+            if (isOnEdge(currentPosition, move.direction)) {
                 if (colorOfCurrentBullet == 1) {
                     newState.redBulletCaptured(bulletColor);
                 }
                 if (colorOfCurrentBullet >= 1) {
-                    move.isCaptureMove = true;
+                    move.affectedBullets++;
                     newState.switchPlayer();
                 }
                 break;
             } else if (colorOfCurrentBullet == 0) {
                 break;
-            } else {
-                currentPosition = shift(currentPosition, move.direction);
             }
+            currentPosition = shift(currentPosition, move.direction);
             colorOfLastBullet = colorOfCurrentBullet;
         }
-        // check win conditions (7 red bullets captured or enemy doesn't have bullets on the board remaining
+        // Check win conditions (7 red bullets captured or enemy doesn't have bullets on the board remaining).
         if (newState.capturedBulletsBlack > 6 || newState.capturedBulletsWhite > 6 || newState.bitmaps[2] == 0  || newState.bitmaps[3] == 0) {
             newState.gameWinner = ((newState.capturedBulletsBlack > 6 || newState.bitmaps[2] == 0) ? 3 : 2);
         }
         newState.lastMove = move;
+        if ((bitmaps[2] & bitmaps[3]) != 0) {
+            for (long bitmap : bitmaps) {
+                System.out.println("bitmap = " + bitmap);
+            }
+        }
         return newState;
     }
 
@@ -169,17 +174,8 @@ public class GameState {
             case LEFT: return currentPosition << 1;
             case RIGHT: return currentPosition >> 1;
         }
+        System.out.println("no direction");
         return 0x0L;
-    }
-
-    private boolean isLastField(long position, Move.MoveDirection direction) {
-        switch(direction) {
-            case UP: return (Long.numberOfLeadingZeros(position) <= 21);
-            case DOWN: return (Long.numberOfLeadingZeros(position) >= 56);
-            case LEFT: return ((Long.numberOfLeadingZeros(position) - 15) % 7 == 0);
-            case RIGHT: return ((Long.numberOfLeadingZeros(position) - 15) % 7 == 6);
-        }
-        return false;
     }
 
     /**
@@ -215,7 +211,6 @@ public class GameState {
             bitboard >>= 1;
             position <<= 1;
         }
-//        moves.forEach(System.out::println);
         return moves;
     }
 
@@ -228,7 +223,7 @@ public class GameState {
      * @return LinkedList of all possible moves
      */
     // TODO: check repetitive moves; TODO: junit tests schreiben
-    // TODO: eigene kugeln werden runtergeschmissen; fixed, checken; scheint zu gehen; TODO: junit tests schreiben
+    // TODO: eigene kugeln werden runtergeschmissen; fixed, checken; scheint nicht zu gehen; TODO: junit tests schreiben
     private LinkedList<Move> possibleMoves(long position, int color) {
         LinkedList<Move> moves = new LinkedList<>();
         // check up
@@ -241,9 +236,10 @@ public class GameState {
                 lastColor = getColorAtPosition(currentPosition);
                 currentPosition <<= 7;
             }
+            // check if the move would throw a bullet over the edge
             if (Long.numberOfLeadingZeros(currentPosition) <= 15){
                 if (lastColor != color) {
-                    moves.add(new Move(position, UP));
+                    moves.add(new Move(position, UP, true));
                 }
             } else {
                 moves.add(new Move(position, UP));
@@ -261,7 +257,7 @@ public class GameState {
             }
             if (currentPosition == 0){
                 if (lastColor != color) {
-                    moves.add(new Move(position, DOWN));
+                    moves.add(new Move(position, DOWN, true));
                 }
             } else {
                 moves.add(new Move(position, DOWN));
@@ -269,26 +265,30 @@ public class GameState {
         }
         // check left
         //  check if field in the opposite direction is empty
-        if (isOnEdge(position, RIGHT) || (bitmaps[0] & (position >> 1)) == 0 && noRepetitiveMove(position, LEFT)) {
+        if ((isOnEdge(position, RIGHT) || (bitmaps[0] & (position >> 1)) == 0) && noRepetitiveMove(position, LEFT)) {
             // find the last bullet that would been moved
             long currentPosition = position;
             while (!isOnEdge(currentPosition, LEFT) && getColorAtPosition(currentPosition) != 0) {
                 currentPosition <<= 1;
             }
-            if (getColorAtPosition(currentPosition) == 0 || (isOnEdge(currentPosition, LEFT) && getColorAtPosition(currentPosition) != color)) {
+            if (getColorAtPosition(currentPosition) == 0) {
                 moves.add(new Move(position, LEFT));
+            } else if (isOnEdge(currentPosition, LEFT) && getColorAtPosition(currentPosition) != color) {
+                moves.add(new Move(position, LEFT, true));
             }
         }
         // check right
         //  check if field in the opposite direction is empty
-        if (isOnEdge(position, LEFT) || (bitmaps[0] & (position << 1)) == 0 && noRepetitiveMove(position, RIGHT)) {
+        if ((isOnEdge(position, LEFT) || (bitmaps[0] & (position << 1)) == 0) && noRepetitiveMove(position, RIGHT)) {
             // find the last bullet that would been moved
             long currentPosition = position;
             while (!isOnEdge(currentPosition, RIGHT) && getColorAtPosition(currentPosition) != 0) {
                 currentPosition >>= 1;
             }
-            if (getColorAtPosition(currentPosition) == 0 || (isOnEdge(currentPosition, RIGHT) && getColorAtPosition(currentPosition) != color)) {
+            if (getColorAtPosition(currentPosition) == 0) {
                 moves.add(new Move(position, RIGHT));
+            } else if (isOnEdge(currentPosition, RIGHT) && getColorAtPosition(currentPosition) != color) {
+                moves.add(new Move(position, RIGHT, true));
             }
         }
         return moves;
@@ -300,10 +300,11 @@ public class GameState {
      * @param position position from which the possible move will start
      * @param direction direction of the possible move
      * @return true if the move is not repetitive
-     */
-    private boolean noRepetitiveMove(long position, Move.MoveDirection direction) {
+     * */
+
+    public boolean noRepetitiveMove(long position, Move.MoveDirection direction) {
         if (lastMove == null) {
-            return false;
+            return true;
         }
         switch(direction){
             case UP: return !((position << (7 * lastMove.affectedBullets) == lastMove.positionFrom) && lastMove.direction == DOWN);
@@ -311,6 +312,7 @@ public class GameState {
             case LEFT: return !((position << lastMove.affectedBullets == lastMove.positionFrom) && lastMove.direction == RIGHT);
             case RIGHT: return !((position >> lastMove.affectedBullets == lastMove.positionFrom) && lastMove.direction == LEFT);
         }
+        System.out.println("rep error");
         return false;
     }
 

@@ -1,4 +1,4 @@
-package gui.view;
+package gameviewer;
 
 public enum PlaceType {
     Sand,

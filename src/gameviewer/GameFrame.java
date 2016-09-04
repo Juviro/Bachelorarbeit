@@ -1,4 +1,4 @@
-package gui.view;
+package gameviewer;
 
 import javax.swing.*;
 import java.awt.*;

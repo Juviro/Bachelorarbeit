@@ -1,10 +1,7 @@
-package gui.view;
+package gameviewer;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 
 /**
  * Represents a place on the {@link GameField}. A place is the smallest unit
