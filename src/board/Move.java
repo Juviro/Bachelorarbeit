@@ -2,11 +2,11 @@ package board;
 
 public class Move {
 
-    public long positionFrom;
-    public long positionTo;
-    public MoveDirection direction;
+    long positionFrom;
+    long positionTo;
+    MoveDirection direction;
     public boolean isCaptureMove = false;
-    public int affectedBullets = 0;
+    int affectedBullets = 0;
 
     public enum MoveDirection {
         UP, DOWN, LEFT, RIGHT
@@ -15,7 +15,7 @@ public class Move {
     /**
      * Constructor.
      *
-     * @param positionFrom position from wich the bullet will move
+     * @param positionFrom position from which the bullet will move
      * @param direction direction in witch the bullet will get pushed
      */
     public Move(final long positionFrom, final MoveDirection direction) {
@@ -36,7 +36,7 @@ public class Move {
      * @param direction direction in witch the bullet will get pushed
      * @param isCaptureMove true if the move throws an enemy or red bullet over the edge
      */
-    public Move(final long positionFrom, final MoveDirection direction, boolean isCaptureMove) {
+    Move(final long positionFrom, final MoveDirection direction, boolean isCaptureMove) {
         this.positionFrom = positionFrom;
         this.direction = direction;
         this.isCaptureMove = isCaptureMove;

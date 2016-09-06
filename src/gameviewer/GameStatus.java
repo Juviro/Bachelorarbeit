@@ -27,7 +27,7 @@ public class GameStatus extends JPanel {
 	/**
 	 * table data
 	 */
-    final String[] columnNames = {"Zug Nr.", "Farbe", "Zug"};
+    final String[] columnNames = {"Zug Nr.", "Farbe", "Zug", "Zeit"};
 	private DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
 	private JTable table = new JTable(tableModel);
 	private String[][] moves;
@@ -70,9 +70,9 @@ public class GameStatus extends JPanel {
 		JPanel pnlConfig = new JPanel();
 	    pnlConfig.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Informationen"));
 	    pnlConfig.setLayout(new GridLayout(0,2));
-	    pnlConfig.add(new JLabel("Kugeln Weiß: "));
+	    pnlConfig.add(new JLabel("Verbleibende Zeit Weiß: "));
 	    pnlConfig.add(lblLapCount);
-	    pnlConfig.add(new JLabel("Kugeln Schwarz: "));
+	    pnlConfig.add(new JLabel("Verbleibende Zeit Schwarz: "));
 	    pnlConfig.add(lblStartPlayer);
 	    pnlConfig.add(new JLabel("Rote Kugeln Weiß: "));
 	    pnlConfig.add(lblGameState);
@@ -179,7 +179,7 @@ public class GameStatus extends JPanel {
 			}
 
 
-			tableModel.addRow(new Object[]{moves[i][0], color, moves[i][3]});
+			tableModel.addRow(new Object[]{moves[i][0], color, moves[i][3], moves[i][8]});
 		}
 		numRows = moves.length;
 		selectedRow = 0;
@@ -191,15 +191,15 @@ public class GameStatus extends JPanel {
 		if(up && selectedRow > 0) {
 			selectedRow--;
 			table.setRowSelectionInterval(selectedRow, selectedRow);
-			setBulletsWhite(String.valueOf(moves[selectedRow][2].length() - moves[selectedRow][2].replace("2", "").length()));
-			setBulletsBlack(String.valueOf(moves[selectedRow][2].length() - moves[selectedRow][2].replace("3", "").length()));
+			setBulletsWhite(moves[selectedRow][6]);
+			setBulletsBlack(moves[selectedRow][7]);
 			setCapturedBulletsWhite(moves[selectedRow][4]);
 			setCapturedBulletsBlack(moves[selectedRow][5]);
 			return moves[selectedRow][2];
 		} else if (!up && (selectedRow + 1) < moves.length) {
 			selectedRow++;
-			setBulletsWhite(String.valueOf(moves[selectedRow][2].length() - moves[selectedRow][2].replace("2", "").length()));
-			setBulletsBlack(String.valueOf(moves[selectedRow][2].length() - moves[selectedRow][2].replace("3", "").length()));
+			setBulletsWhite(moves[selectedRow][6]);
+			setBulletsBlack(moves[selectedRow][7]);
 			setCapturedBulletsWhite(moves[selectedRow][4]);
 			setCapturedBulletsBlack(moves[selectedRow][5]);
 			table.setRowSelectionInterval(selectedRow, selectedRow);

@@ -1,7 +1,6 @@
-package ais.negamaxV1;
+package ais.negamax;
 
 import board.GameState;
-import board.Move;
 
 public class Ratings {
 
@@ -20,7 +19,6 @@ public class Ratings {
         // get all the different ratings
         double redBulletRating = bulletRating(state);
         double bulletPredominance = bulletPredominance(state.bitmaps);
-//        double capturemoveBonus =
 
         // weight them and add them
         double rating = redBulletRating * weights[PLAYER_MULTIPLIER] + bulletPredominance * weights[PREDOMINANCE_MULTIPLIER];

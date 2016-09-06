@@ -1,13 +1,18 @@
-package ais.negamaxV1;
+package ais.negamax;
 
 import board.GameState;
 import board.Move;
-
 import java.util.LinkedList;
+
+/**
+ * Simple Negamax based AI
+ *
+ */
 
 public class NegamaxAIv1 {
     private static final int DEPTH = 5;
     private LinkedList<Move> bestMoves = new LinkedList<>();
+    public int numberOfVisitedNodes = 0;
 
 
     public GameState performMove(GameState state) {
@@ -29,6 +34,7 @@ public class NegamaxAIv1 {
      * @return current rating
      */
     private double negamax(GameState state, int depth, int color) {
+        numberOfVisitedNodes++;
         // If the game is over, return a high value. This value is increased based on how deep we're currently.
         if (state.gameWinner != -1) {
             if (state.gameWinner == color) {

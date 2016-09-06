@@ -1,4 +1,4 @@
-package test;
+package tests;
 
 import board.GameState;
 import board.Move;
@@ -26,10 +26,5 @@ public class GameStateTest {
     @Test
     public void testMoveRepetition() {
         assertFalse(gameState.noRepetitiveMove(2L, Move.MoveDirection.UP));
-//        long position = 1;
-//        for (long i = 0; i < 49; i++) {
-//            System.out.println(position + ": " + gameState.noRepetitiveMove(position, Move.MoveDirection.UP));
-//            position <<= 1;
-//        }
     }
 }

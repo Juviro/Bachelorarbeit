@@ -1,38 +1,62 @@
 package gameenvironment;
 
 import ais.dummy.DummyAI;
-import ais.negamaxV1.NegamaxAIv1;
+import ais.negamax.NegamaxAIv1;
+import ais.negamax.NegamaxAIv2;
+import ais.negamax.NegamaxAIv3;
+import ais.other.ainames;
 import board.GameState;
 import board.Parser;
 
 import java.io.FileWriter;
 import java.io.IOException;
 
-class GameProcessor {
+public class GameProcessor {
 
     // headline for the logging
-    private String gameLog = "MoveNr.;activePlayer;fieldString;lastMove;bulletsCapturedWhite;bulletsCapturedBlack\n";
+    private String gameLog = "MoveNr.;activePlayer;fieldString;lastMove;bulletsCapturedWhite;bulletsCapturedBlack;timeRemainingWhite;timeRemainingBlack;timeUsedForLastMove\n";
 
     private int gameNumber;
 
-    private NegamaxAIv1 negamaxAI = new NegamaxAIv1();
+    public GameState gameState;
+
+    private NegamaxAIv1 negamaxAIV1 = new NegamaxAIv1();
+    private NegamaxAIv2 negamaxAIV2 = new NegamaxAIv2();
+    private NegamaxAIv3 negamaxAIV3 = new NegamaxAIv3();
+
+    public long timeRemainingWhite;
+    public long timeRemainingBlack;
+    private long timeUsedForLastMove;
+
+    public int numberOfVisitedNodesWhite = 0;
+    public int numberOfVisitedNodesBlack = 0;
+
+    private ainames.AIs AIWhite;
+    private ainames.AIs AIBlack;
 
     public int winner = -1;
 
     /**
      *Starts a new game with the given options
-     *
-     * @param startingSetup representation of the board as a string
+     *  @param startingSetup representation of the board as a string
      * @param whiteStarts true if white starts
      * @param gameNumber current game number
+     * @param logGames
      */
-    GameProcessor(String startingSetup, boolean whiteStarts, int gameNumber) {
+    public GameProcessor(String startingSetup, boolean whiteStarts, int gameNumber, long gameTime,ainames.AIs AIWhite, ainames.AIs AIBlack, boolean logGames) {
         this.gameNumber = gameNumber;
+        this.AIWhite = AIWhite;
+        this.AIBlack = AIBlack;
+
+        negamaxAIV3.timeTotal = gameTime;
+
         long[] bitmaps = createBitmaps(startingSetup);
         int startingPlayer = (whiteStarts ? 2 : 3);
+        timeRemainingWhite = gameTime;
+        timeRemainingBlack = gameTime;
 
         // initialize the game
-        GameState gameState = new GameState(startingPlayer);
+        gameState = new GameState(startingPlayer);
         gameState.bitmaps = bitmaps;
 
         int player = (whiteStarts ? 2 : 3);
@@ -40,44 +64,66 @@ class GameProcessor {
 
         // start the game and play it, until it's over
         while (gameState.gameWinner == -1) {
-            switch (gameState.activePlayer) {
-                case 2: gameState = performMoveWhite(gameState); break;
-                case 3: gameState = performMoveBlack(gameState); break;
+            gameState = performMove(gameState);
+            if (logGames) {
+                logState(gameState);
             }
-            logState(gameState);
             if (gameState.turn > 200) {
                 break;
             }
         }
 
-        // save the log as a .csv file
-        saveLog();
+        if (logGames) {
+            // save the log as a .csv file
+            saveLog();
+        }
+        setNumberOfVisitedNodes();
         winner = gameState.gameWinner;
         System.out.println("Player " + winner + " won game " + gameNumber + "!");
     }
 
     /**
-     * performs a move for white
+     * Performs a move and updates the remaining time.
      * @param state current state
      * @return the new state after the move
      */
-    private GameState performMoveWhite(GameState state) {
-        return performMoveNegamaxAI(state);
+    private GameState performMove(GameState state) {
+        int player = state.activePlayer;
+        GameState newGameState;
+        ainames.AIs currentAI = (player == 2 ? AIWhite : AIBlack);
+
+        long currentTime = System.currentTimeMillis();
+        switch (currentAI) {
+            case DUMMY: newGameState = performMoveDummyKi(state);
+                break;
+            case NEGAMAXV1: newGameState = performMoveNegamaxAIV1(state);
+                break;
+            case NEGAMAXV2: newGameState = performMoveNegamaxAIV2(state);
+                break;
+            case NEGAMAXV3: newGameState = performMoveNegamaxAIV3(state);
+                break;
+            default: newGameState = state;
+        }
+        timeUsedForLastMove = (System.currentTimeMillis() - currentTime);
+        switch (player) {
+            case 2: timeRemainingWhite -= timeUsedForLastMove; break;
+            case 3: timeRemainingBlack -= timeUsedForLastMove; break;
+        }
+        if (timeRemainingWhite < 0) {
+            newGameState.gameWinner = 3;
+        } else if (timeRemainingBlack < 0) {
+            newGameState.gameWinner = 2;
+        }
+        return newGameState;
     }
 
-    /**
-     * performs a move for black
-     * @param state current state
-     * @return the new state after the move
-     */
-    private GameState performMoveBlack(GameState state) {
-//        return performMoveDummyKi(state);
-        return performMoveNegamaxAI(state);
-    }
+
+    // ########################################################## AIs ##############################################################
+
 
 
     /**
-     * dummy AI for test purposes. Executes a random legal move
+     * Dummy AI for test purposes. Executes a random legal move.
      *
      * @param state current state
      * @return the new state after the move
@@ -92,16 +138,38 @@ class GameProcessor {
      * @param state current state
      * @return the new state after the move
      */
-    private GameState performMoveNegamaxAI(GameState state){
-        return negamaxAI.performMove(state);
+    private GameState performMoveNegamaxAIV1(GameState state){
+        return negamaxAIV1.performMove(state);
     }
+
+    /**
+     * AI based on a negamax algorithm with alpha beta pruning
+     *
+     * @param state current state
+     * @return the new state after the move
+     */
+    private GameState performMoveNegamaxAIV2(GameState state){
+        return negamaxAIV2.performMove(state);
+    }
+
+    /**
+     * AI based on a negamax algorithm with alpha beta pruning, time management and dynamic depth for the negamax algorithm.
+     *
+     * @param state current state
+     * @return the new state after the move
+     */
+    private GameState performMoveNegamaxAIV3(GameState state){
+        return negamaxAIV3.performMove(state);
+    }
+
+    // ########################################################## logs ##############################################################
 
     /**
      * after every move, logs the current state
      * @param gameState current state
      */
     private void logState(GameState gameState) {
-        gameLog += (gameState.turn + 1) + ";" + gameState.activePlayer + ";" + Parser.bitboardToString(gameState.bitmaps) + ";" + Parser.moveToString(gameState.lastMove) + ";" + gameState.capturedBulletsWhite + ";" + gameState.capturedBulletsBlack + "\n";
+        gameLog += (gameState.turn + 1) + ";" + gameState.activePlayer + ";" + Parser.bitboardToString(gameState.bitmaps) + ";" + Parser.moveToString(gameState.lastMove) + ";" + gameState.capturedBulletsWhite + ";" + gameState.capturedBulletsBlack + ";" + timeRemainingWhite + ";" + timeRemainingBlack + ";" + timeUsedForLastMove + "\n";
     }
 
     /**
@@ -110,7 +178,7 @@ class GameProcessor {
      * @param player the starting player
      */
     private void firstLog(String position, int player){
-        gameLog += "1;" + player + ";" + position + ";;0;0\n";
+        gameLog += "1;" + player + ";" + position + ";;0;0;" + timeRemainingWhite + ";" + timeRemainingBlack + ";\n";
     }
 
     /**
@@ -128,6 +196,23 @@ class GameProcessor {
             e.printStackTrace();
         }
     }
+
+    private void setNumberOfVisitedNodes() {
+        switch (AIWhite) {
+            case NEGAMAXV1: numberOfVisitedNodesWhite = negamaxAIV1.numberOfVisitedNodes;
+                break;
+            case NEGAMAXV2: numberOfVisitedNodesWhite = negamaxAIV2.numberOfVisitedNodes;
+                break;
+        }
+        switch (AIBlack) {
+            case NEGAMAXV1: numberOfVisitedNodesBlack = negamaxAIV1.numberOfVisitedNodes;
+                break;
+            case NEGAMAXV2: numberOfVisitedNodesBlack = negamaxAIV2.numberOfVisitedNodes;
+                break;
+        }
+    }
+
+    // ########################################################## setup ##############################################################
 
     /**
      * creates the bitmaps to initialize the first gameState

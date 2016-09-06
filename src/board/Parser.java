@@ -107,7 +107,7 @@ public class Parser {
                 String[] tokens = line.split(delimiter);
                 list.add(tokens);
             }
-            arr = new String[list.size()][6];
+            arr = new String[list.size()][9];
             for(int j = 0; j < list.size(); j++) {
                 for (int i = 0; i < list.get(j).length; i++) {
                     arr[j][i] = list.get(j)[i];
