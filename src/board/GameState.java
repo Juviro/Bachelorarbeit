@@ -159,11 +159,11 @@ public class GameState {
             newState.gameWinner = ((newState.capturedBulletsBlack > 6 || newState.bitmaps[2] == 0) ? 3 : 2);
         }
         newState.lastMove = move;
-        if ((bitmaps[2] & bitmaps[3]) != 0) {
-            for (long bitmap : bitmaps) {
-                System.out.println("bitmap = " + bitmap);
-            }
-        }
+//        if ((bitmaps[2] & bitmaps[3]) != 0) {
+//            for (long bitmap : bitmaps) {
+//                System.out.println("bitmap = " + bitmap);
+//            }
+//        }
         return newState;
     }
 
@@ -174,7 +174,6 @@ public class GameState {
             case LEFT: return currentPosition << 1;
             case RIGHT: return currentPosition >> 1;
         }
-        System.out.println("no direction");
         return 0x0L;
     }
 

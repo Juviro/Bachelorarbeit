@@ -1,6 +1,6 @@
 package gameenvironment;
 
-import ais.other.ainames;
+import ais.other.AINames;
 
 public class StartGame {
 
@@ -9,10 +9,10 @@ public class StartGame {
         String startingSetup = "2200033220103300111000111110001110033010223300022";
         long gameTime = 20000;
         boolean logGame = true;
-        new StartGame(numberOfGames, startingSetup, true, gameTime, ainames.AIs.NEGAMAXV1, ainames.AIs.NEGAMAXV2, logGame);
+        new StartGame(numberOfGames, startingSetup, true, gameTime, AINames.AIs.NEGAMAXV1, AINames.AIs.NEGAMAXV2, logGame);
     }
 
-    public StartGame(int numberOfGames, String startingSetup, boolean whiteStarts,  long gameTime, ainames.AIs aiWhite, ainames.AIs aiBlack, boolean logGame) {
+    public StartGame(int numberOfGames, String startingSetup, boolean whiteStarts, long gameTime, AINames.AIs aiWhite, AINames.AIs aiBlack, boolean logGame) {
         int wonGamesWhite = 0;
         int wonGamesBlack = 0;
         for (int i = 0; i < numberOfGames; i++) {

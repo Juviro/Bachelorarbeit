@@ -1,23 +1,22 @@
 package benchmarks;
 
-import ais.other.ainames;
+import ais.other.AINames;
 import gameenvironment.GameProcessor;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Date;
 
 /**
  * Compares the different states for the negamax AIs.
  */
-public class performanceComparison {
+public class PerformanceComparison {
 
     public static void main (String[] args) {
-        compareAIs(ainames.AIs.NEGAMAXV1, ainames.AIs.NEGAMAXV2);
+        compareAIs(AINames.AIs.NEGAMAXV3, AINames.AIs.NEGAMAXV2);
     }
 
 
-    private static void compareAIs (ainames.AIs aiWhite, ainames.AIs aiBlack) {
+    private static void compareAIs (AINames.AIs aiWhite, AINames.AIs aiBlack) {
 
         int wonGamesWhite = 0;
         int wonGamesBlack = 0;
@@ -32,9 +31,9 @@ public class performanceComparison {
         int numberOfGames = 100;
         String startingSetup = "2200033220103300111000111110001110033010223300022";
         long gameTime = 20000;
-        String gameLog = "Game number;turns;winner;captured bullets white;captured bullets black;remaining bullets white; remaining bullets black;time used white; time used black; nodes visited white; nodes visited black\n";
+        String gameLog = "Game number;turns;winner;captured bullets white;captured bullets black;remaining bullets white; remaining bullets black;time remaining white; time remaining black; nodes visited white; nodes visited black\n";
         for (int i = 0; i < numberOfGames; i++) {
-            GameProcessor currentGame = new GameProcessor(startingSetup, whiteStarts, (i + 1),gameTime aiWhite, aiBlack, true);
+            GameProcessor currentGame = new GameProcessor(startingSetup, whiteStarts, (i + 1),gameTime, aiWhite, aiBlack, true);
             whiteStarts = !whiteStarts;
             switch(currentGame.winner) {
                 case 2: wonGamesWhite++;break;
@@ -48,8 +47,14 @@ public class performanceComparison {
             numberOfVisitedNodesBlack += (currentGame.numberOfVisitedNodesBlack / numberOfGames);
             turns += currentGame.gameState.turn;
 
+            if (currentGame.timeRemainingWhite < 0) {
+                System.out.println("white lost via time");
+            } else if (currentGame.timeRemainingBlack < 0) {
+                System.out.println("black lost via time");
+            }
+
             gameLog += (i + 1) + ";" + currentGame.gameState.turn + ";" + currentGame.gameState.gameWinner + ";" + currentGame.gameState.capturedBulletsWhite + ";" + currentGame.gameState.capturedBulletsBlack + ";" + remainingBulletsWhite + ";" + remainingBulletsBlack + ";";
-            gameLog += (gameTime - currentGame.timeRemainingWhite) + ";" + (gameTime - currentGame.timeRemainingBlack) + ";" +  currentGame.numberOfVisitedNodesWhite + ";" + currentGame.numberOfVisitedNodesBlack + "\n";
+            gameLog += currentGame.timeRemainingWhite + ";" + currentGame.timeRemainingBlack + ";" +  currentGame.numberOfVisitedNodesWhite + ";" + currentGame.numberOfVisitedNodesBlack + "\n";
         }
 
         String logStats = ";" + aiWhite + ";" + aiBlack + "\n";
@@ -70,7 +75,7 @@ public class performanceComparison {
     /**
      * save the String log to a .csv
      */
-    private static void saveLog(String gameLog, ainames.AIs aiWhite, ainames.AIs aiBlack) {
+    private static void saveLog(String gameLog, AINames.AIs aiWhite, AINames.AIs aiBlack) {
         String ais = aiWhite + " vs " + aiBlack;
         FileWriter writer;
         try {

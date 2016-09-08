@@ -9,10 +9,10 @@ import static java.lang.Double.max;
 import static java.lang.Double.min;
 
 /**
- * Negamax AI with alpha beta pruning, time-management, Quiescence search and dynamic depth for the negamax algorithm. *
+ * Same as V3, but with improved rating functions
  *
  */
-public class NegamaxAIv3 {
+public class NegamaxAIv4 {
     private int DEPTH = 7;
     private LinkedList<Move> bestMoves = new LinkedList<>();
     public int numberOfVisitedNodes = 0;
@@ -72,7 +72,7 @@ public class NegamaxAIv3 {
         // Rate if we found our depth goal.
         // If the last move was a capture move, perform another iteration instead (only four times to not go too deep).
         if ((depth <= 0 && !state.lastMove.isCaptureMove) || depth < -3) {
-            return Ratings.rateState(state, color);
+            return Ratings.rateStateV2(state, color);
         }
 
         double bestValue = Double.NEGATIVE_INFINITY;

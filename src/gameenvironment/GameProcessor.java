@@ -4,7 +4,8 @@ import ais.dummy.DummyAI;
 import ais.negamax.NegamaxAIv1;
 import ais.negamax.NegamaxAIv2;
 import ais.negamax.NegamaxAIv3;
-import ais.other.ainames;
+import ais.negamax.NegamaxAIv4;
+import ais.other.AINames;
 import board.GameState;
 import board.Parser;
 
@@ -23,6 +24,7 @@ public class GameProcessor {
     private NegamaxAIv1 negamaxAIV1 = new NegamaxAIv1();
     private NegamaxAIv2 negamaxAIV2 = new NegamaxAIv2();
     private NegamaxAIv3 negamaxAIV3 = new NegamaxAIv3();
+    private NegamaxAIv4 negamaxAIV4 = new NegamaxAIv4();
 
     public long timeRemainingWhite;
     public long timeRemainingBlack;
@@ -31,8 +33,8 @@ public class GameProcessor {
     public int numberOfVisitedNodesWhite = 0;
     public int numberOfVisitedNodesBlack = 0;
 
-    private ainames.AIs AIWhite;
-    private ainames.AIs AIBlack;
+    private AINames.AIs AIWhite;
+    private AINames.AIs AIBlack;
 
     public int winner = -1;
 
@@ -41,9 +43,9 @@ public class GameProcessor {
      *  @param startingSetup representation of the board as a string
      * @param whiteStarts true if white starts
      * @param gameNumber current game number
-     * @param logGames
+     * @param logGames true if the games should get logged
      */
-    public GameProcessor(String startingSetup, boolean whiteStarts, int gameNumber, long gameTime,ainames.AIs AIWhite, ainames.AIs AIBlack, boolean logGames) {
+    public GameProcessor(String startingSetup, boolean whiteStarts, int gameNumber, long gameTime, AINames.AIs AIWhite, AINames.AIs AIBlack, boolean logGames) {
         this.gameNumber = gameNumber;
         this.AIWhite = AIWhite;
         this.AIBlack = AIBlack;
@@ -90,7 +92,12 @@ public class GameProcessor {
     private GameState performMove(GameState state) {
         int player = state.activePlayer;
         GameState newGameState;
-        ainames.AIs currentAI = (player == 2 ? AIWhite : AIBlack);
+        AINames.AIs currentAI = (player == 2 ? AIWhite : AIBlack);
+        long timeRemaining = 0;
+        switch (player) {
+            case 2: timeRemaining = timeRemainingWhite;break;
+            case 3: timeRemaining = timeRemainingBlack;break;
+        }
 
         long currentTime = System.currentTimeMillis();
         switch (currentAI) {
@@ -100,7 +107,9 @@ public class GameProcessor {
                 break;
             case NEGAMAXV2: newGameState = performMoveNegamaxAIV2(state);
                 break;
-            case NEGAMAXV3: newGameState = performMoveNegamaxAIV3(state);
+            case NEGAMAXV3: newGameState = performMoveNegamaxAIV3(state, timeRemaining);
+                break;
+            case NEGAMAXV4: newGameState = performMoveNegamaxAIV4(state, timeRemaining);
                 break;
             default: newGameState = state;
         }
@@ -156,10 +165,22 @@ public class GameProcessor {
      * AI based on a negamax algorithm with alpha beta pruning, time management and dynamic depth for the negamax algorithm.
      *
      * @param state current state
+     * @param timeRemaining time remaining
      * @return the new state after the move
      */
-    private GameState performMoveNegamaxAIV3(GameState state){
-        return negamaxAIV3.performMove(state);
+    private GameState performMoveNegamaxAIV3(GameState state, long timeRemaining){
+        return negamaxAIV3.performMove(state,timeRemaining);
+    }
+
+    /**
+     * AI based on a negamax algorithm with alpha beta pruning, time management, dynamic depth for the negamax algorithm and improved rating function.
+     *
+     * @param state current state
+     * @param timeRemaining time remaining
+     * @return the new state after the move
+     */
+    private GameState performMoveNegamaxAIV4(GameState state, long timeRemaining){
+        return negamaxAIV4.performMove(state,timeRemaining);
     }
 
     // ########################################################## logs ##############################################################
@@ -203,11 +224,15 @@ public class GameProcessor {
                 break;
             case NEGAMAXV2: numberOfVisitedNodesWhite = negamaxAIV2.numberOfVisitedNodes;
                 break;
+            case NEGAMAXV3: numberOfVisitedNodesWhite = negamaxAIV3.numberOfVisitedNodes;
+                break;
         }
         switch (AIBlack) {
             case NEGAMAXV1: numberOfVisitedNodesBlack = negamaxAIV1.numberOfVisitedNodes;
                 break;
             case NEGAMAXV2: numberOfVisitedNodesBlack = negamaxAIV2.numberOfVisitedNodes;
+                break;
+            case NEGAMAXV3: numberOfVisitedNodesBlack = negamaxAIV3.numberOfVisitedNodes;
                 break;
         }
     }
