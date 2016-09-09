@@ -23,6 +23,8 @@ public class NegamaxAIv4 {
     private long timeStarted;
     private long timeRemaining;
 
+    private int activePlayer;
+
 
     public GameState performMove(GameState state, long timeRemaining) {
         // if you can't make a move, you lost the game
@@ -30,6 +32,7 @@ public class NegamaxAIv4 {
             state.gameWinner = (state.activePlayer == 2 ? 3 : 2);
         }
 
+        activePlayer = state.activePlayer;
         this.timeRemaining = timeRemaining;
         
         double percentageTimeUsed = 1 - (double) timeRemaining / (double) timeTotal;
@@ -88,6 +91,13 @@ public class NegamaxAIv4 {
             } else {
                 v = negamax(state.executeMove(move), depth - 1, color, alpha, beta);
             }
+
+            // captureMoves weight more
+            if (move.isCaptureMove) {
+                double multiplier = (activePlayer == color ? 1.25 : 0.75);
+                v *= multiplier;
+            }
+
             // save all equally rated moves to make the movement choice non-deterministic
             if (v == bestValue && depth == DEPTH) {
                 bestMoves.add(move);

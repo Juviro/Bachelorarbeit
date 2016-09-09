@@ -51,6 +51,7 @@ public class GameProcessor {
         this.AIBlack = AIBlack;
 
         negamaxAIV3.timeTotal = gameTime;
+        negamaxAIV4.timeTotal = gameTime;
 
         long[] bitmaps = createBitmaps(startingSetup);
         int startingPlayer = (whiteStarts ? 2 : 3);
@@ -226,6 +227,8 @@ public class GameProcessor {
                 break;
             case NEGAMAXV3: numberOfVisitedNodesWhite = negamaxAIV3.numberOfVisitedNodes;
                 break;
+            case NEGAMAXV4: numberOfVisitedNodesWhite = negamaxAIV4.numberOfVisitedNodes;
+                break;
         }
         switch (AIBlack) {
             case NEGAMAXV1: numberOfVisitedNodesBlack = negamaxAIV1.numberOfVisitedNodes;
@@ -233,6 +236,8 @@ public class GameProcessor {
             case NEGAMAXV2: numberOfVisitedNodesBlack = negamaxAIV2.numberOfVisitedNodes;
                 break;
             case NEGAMAXV3: numberOfVisitedNodesBlack = negamaxAIV3.numberOfVisitedNodes;
+                break;
+            case NEGAMAXV4: numberOfVisitedNodesBlack = negamaxAIV4.numberOfVisitedNodes;
                 break;
         }
     }
