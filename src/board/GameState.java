@@ -33,11 +33,6 @@ public class GameState {
 
     static final int NUMBER_OF_FIELDS = 49;
 
-
-    public static final int PLAYER_WHITE = 2;
-
-    public static final int PLAYER_BLACK = 3;
-
     /**
      * 2 for white, 3 for black
      */
@@ -50,14 +45,14 @@ public class GameState {
 
 
     /**
-     *  true if one player has captured at least 7 bullets
+     *  Number of the player who won the game, -1 until there is no winner.
      */
 
     public int gameWinner = -1;
 
 
     /**
-     * All bitboards representad as array(long).
+     * All bitboards represented as array(long).
      */
     public long[] bitmaps;
 
@@ -87,11 +82,9 @@ public class GameState {
      * copy current gameState
      * @return the copy
      */
-    public GameState copy() {
+    private GameState copy() {
         GameState newState = new GameState(activePlayer);
-        for (int i = 0; i < bitmaps.length; i++) {
-            newState.bitmaps[i] = this.bitmaps[i];
-        }
+        System.arraycopy(this.bitmaps, 0, newState.bitmaps, 0, bitmaps.length);
         newState.capturedBulletsBlack = this.capturedBulletsBlack;
         newState.capturedBulletsWhite = this.capturedBulletsWhite;
         newState.turn = this.turn;
@@ -99,10 +92,10 @@ public class GameState {
     }
 
     /**
-     * execute a move on a gameState
+     * Execute a move on a gameState.
      *
-     * @param move
-     * @return new gameState after the move is performed
+     * @param move the move to be executed.
+     * @return new gameState after the move is performed.
      */
 
     public GameState executeMove(Move move) {
@@ -159,11 +152,6 @@ public class GameState {
             newState.gameWinner = ((newState.capturedBulletsBlack > 6 || newState.bitmaps[2] == 0) ? 3 : 2);
         }
         newState.lastMove = move;
-//        if ((bitmaps[2] & bitmaps[3]) != 0) {
-//            for (long bitmap : bitmaps) {
-//                System.out.println("bitmap = " + bitmap);
-//            }
-//        }
         return newState;
     }
 
@@ -311,10 +299,14 @@ public class GameState {
             case LEFT: return !((position << lastMove.affectedBullets == lastMove.positionFrom) && lastMove.direction == RIGHT);
             case RIGHT: return !((position >> lastMove.affectedBullets == lastMove.positionFrom) && lastMove.direction == LEFT);
         }
-        System.out.println("rep error");
         return false;
     }
 
+    /**
+     *
+     * @param position position to check the color
+     * @return the color of the bullet at the give position, or 0 if there is no bullet at that position.
+     */
     private int getColorAtPosition(long position) {
         for (int i = 1; i < NUMBER_OF_BITMAPS; i++) {
             if ((position & bitmaps[i]) != 0) {
@@ -342,7 +334,7 @@ public class GameState {
     }
 
     /**
-     * check if a bullet of a give color is on the give position
+     * Check if a bullet of a give color is on the give position.
      *
      * @param position position
      * @param color 2 for white, 3 for black
@@ -353,7 +345,7 @@ public class GameState {
     }
 
     /**
-     * prints the current board
+     * Prints the current board to the console.
      */
     public void printField() {
         System.out.println("");
@@ -370,7 +362,7 @@ public class GameState {
     }
 
     /**
-     * prints current stats
+     * Prints current stats to the console.
      */
     public void printStats() {
         System.out.println("");

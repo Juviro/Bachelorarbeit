@@ -13,7 +13,7 @@ import static java.lang.Double.min;
  *
  */
 public class NegamaxAIv4 {
-    private int DEPTH = 7;
+    private int max_depth = 7;
     private LinkedList<Move> bestMoves = new LinkedList<>();
     public int numberOfVisitedNodes = 0;
 
@@ -38,16 +38,16 @@ public class NegamaxAIv4 {
         double percentageTimeUsed = 1 - (double) timeRemaining / (double) timeTotal;
         double estimatedTurnPercentage = min((double) state.turn / (double) AVERAGE_TURNS_PER_GAME, 1);
 
-        // Increase/decrease the DEPTH dynamically based on how much time we used already and how many further turns we expect to see. Fixed DEPTH if 10% or less time remains.
+        // Increase/decrease the max_depth dynamically based on how much time we used already and how many further turns we expect to see. Fixed max_depth if 10% or less time remains.
         if (percentageTimeUsed > 0.9) {
-          DEPTH = 6;
-        } else if (percentageTimeUsed < estimatedTurnPercentage * 0.8 && DEPTH < 9) {
-            DEPTH++;
-        } else if (percentageTimeUsed > estimatedTurnPercentage  && DEPTH > 7) {
-            DEPTH--;
+          max_depth = 6;
+        } else if (percentageTimeUsed < estimatedTurnPercentage * 0.8 && max_depth < 9) {
+            max_depth++;
+        } else if (percentageTimeUsed > estimatedTurnPercentage  && max_depth > 7) {
+            max_depth--;
         }
         timeStarted = System.currentTimeMillis();
-        negamax(state, DEPTH, state.activePlayer, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+        negamax(state, max_depth, state.activePlayer, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
         Move bestMove = bestMoves.get((int) (Math.random() * bestMoves.size()));
         return state.executeMove(bestMove);
     }
@@ -56,7 +56,7 @@ public class NegamaxAIv4 {
      * Negamax algorithm
      *
      * @param state current state
-     * @param depth goes from DEPTH to 0
+     * @param depth goes from max_depth to 0
      * @param color 2 for white, 3 for black
      * @param alpha alpha
      * @param beta beta
@@ -73,8 +73,8 @@ public class NegamaxAIv4 {
             }
         }
         // Rate if we found our depth goal.
-        // If the last move was a capture move, perform another iteration instead (only four times to not go too deep).
-        if ((depth <= 0 && !state.lastMove.isCaptureMove) || depth < -3) {
+        // If the last move was a capture move, perform another iteration instead (maximum five times to not go too deep).
+        if ((depth <= 0 && !state.lastMove.isCaptureMove) || depth < -4) {
             return Ratings.rateStateV2(state, color);
         }
 
@@ -99,23 +99,24 @@ public class NegamaxAIv4 {
             }
 
             // save all equally rated moves to make the movement choice non-deterministic
-            if (v == bestValue && depth == DEPTH) {
+            if (v == bestValue && depth == max_depth) {
                 bestMoves.add(move);
-            } else if (v > bestValue && depth == DEPTH) {
+            } else if (v > bestValue && depth == max_depth) {
                 bestMoves =  new LinkedList<>();
                 bestMoves.add(move);
                 bestValue = v;
             }
             bestValue = max(bestValue, v);
             alpha = max(alpha, v);
+
+            // Stop the search if it's taking too much time.
             boolean tooMuchTimeSpent = ((System.currentTimeMillis() - timeStarted) > 0.2 * timeRemaining);
             if (tooMuchTimeSpent){
-                if (depth == DEPTH) {
-                    DEPTH--;
+                if (depth == max_depth) {
+                    max_depth--;
                 }
                 break;
             } else if (alpha > beta) {
-
                 break;
             }
         }
