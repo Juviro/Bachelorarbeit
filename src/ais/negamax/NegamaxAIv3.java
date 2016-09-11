@@ -18,8 +18,8 @@ public class NegamaxAIv3 {
     public int numberOfVisitedNodes = 0;
 
     private static final int AVERAGE_TURNS_PER_GAME = 50;
-    public long timeTotal;
 
+    public long timeTotal;
     private long timeStarted;
     private long timeRemaining;
 
@@ -27,19 +27,21 @@ public class NegamaxAIv3 {
 
 
     public GameState performMove(GameState state, long timeRemaining) {
-        // if you can't make a move, you lost the game
-        if (state.getAllMoves(state.activePlayer).isEmpty()){
-            state.gameWinner = (state.activePlayer == 2 ? 3 : 2);
-        }
-
         activePlayer = state.activePlayer;
         this.timeRemaining = timeRemaining;
+
+        // if you can't make a move, you lost the game
+        if (state.getAllMoves(activePlayer).isEmpty()){
+            state.gameWinner = (activePlayer == 2 ? 3 : 2);
+        }
 
         // Keep track of the time we spent already for this move to not use too much.
         timeStarted = System.currentTimeMillis();
 
+        // Adjust the current max_depth based on the time used already and the time remaining.
         setMaxDepth(timeRemaining, state.turn);
 
+        // Perform the search for the best move with the negamax algorithm.
         negamax(state, max_depth, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
         // Take a random move from all of the equal best moves.
