@@ -5,6 +5,6 @@ package ais.other;
  */
 public class AINames {
     public enum AIs {
-        DUMMY, NEGAMAXV1, NEGAMAXV2, NEGAMAXV3, NEGAMAXV4
+        DUMMY, NEGAMAXV1, NEGAMAXV2, NEGAMAXV3, NEGAMAXV4, NEGAMAXV5
     }
 }

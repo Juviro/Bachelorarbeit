@@ -12,7 +12,7 @@ import java.io.IOException;
 public class PerformanceComparison {
 
     public static void main (String[] args) {
-        compareAIs(AINames.AIs.NEGAMAXV3, AINames.AIs.NEGAMAXV2);
+        compareAIs(AINames.AIs.NEGAMAXV3, AINames.AIs.NEGAMAXV4);
     }
 
 
@@ -28,7 +28,7 @@ public class PerformanceComparison {
 
 
         boolean whiteStarts = true;
-        int numberOfGames = 100;
+        int numberOfGames = 1000;
         String startingSetup = "2200033220103300111000111110001110033010223300022";
         long gameTime = 20000;
         String gameLog = "Game number;turns;winner;captured bullets white;captured bullets black;remaining bullets white; remaining bullets black;time remaining white; time remaining black; nodes visited white; nodes visited black\n";
@@ -60,9 +60,7 @@ public class PerformanceComparison {
         String logStats = ";" + aiWhite + ";" + aiBlack + "\n";
         logStats += "Games won total;"+  wonGamesWhite + ";" + wonGamesBlack + "\n";
         logStats += "Games won percent;"+  ((float) wonGamesWhite / (float) (wonGamesBlack + wonGamesWhite)) + ";" + ((float) wonGamesBlack / (float) (wonGamesBlack + wonGamesWhite)) + "\n";
-        logStats += "Time used total;" +  timeUsedWhite * numberOfGames + ";" + timeUsedBlack * numberOfGames + "\n";
         logStats += "Time used/game;" + timeUsedWhite  + ";" + timeUsedBlack  + "\n";
-        logStats += "Nodes visited total;" +  numberOfVisitedNodesWhite * numberOfGames + ";" + numberOfVisitedNodesBlack * numberOfGames + "\n";
         logStats += "Nodes visited/gamed;" + numberOfVisitedNodesWhite  + ";" + numberOfVisitedNodesBlack + "\n";
         logStats += "\n\naverage turns;" + (turns / numberOfGames) + "\n";
 

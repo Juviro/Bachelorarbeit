@@ -9,10 +9,10 @@ import static java.lang.Double.max;
 import static java.lang.Double.min;
 
 /**
- * Same as V3, but with improved rating functions
+ * Same as V4, but with transposition table.
  *
  */
-public class NegamaxAIv4 {
+public class NegamaxAIv5 {
     private int DEPTH = 7;
     private LinkedList<Move> bestMoves = new LinkedList<>();
     public int numberOfVisitedNodes = 0;
@@ -93,13 +93,13 @@ public class NegamaxAIv4 {
             }
 
             // captureMoves weight more
-            if (move.isCaptureMove && depth == DEPTH) {
+            if (move.isCaptureMove) {
                 double multiplier = (activePlayer == color ? 1.25 : 0.75);
                 v *= multiplier;
             }
 
             // save all equally rated moves to make the movement choice non-deterministic
-            if (v == bestValue && depth == DEPTH) {
+            if (v == bestValue && depth == DEPTH && depth == DEPTH) {
                 bestMoves.add(move);
             } else if (v > bestValue && depth == DEPTH) {
                 bestMoves =  new LinkedList<>();
@@ -141,7 +141,6 @@ public class NegamaxAIv4 {
         sortedList.addAll(moves);
         return sortedList;
     }
-
 }
 
 

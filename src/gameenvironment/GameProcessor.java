@@ -1,10 +1,7 @@
 package gameenvironment;
 
 import ais.dummy.DummyAI;
-import ais.negamax.NegamaxAIv1;
-import ais.negamax.NegamaxAIv2;
-import ais.negamax.NegamaxAIv3;
-import ais.negamax.NegamaxAIv4;
+import ais.negamax.*;
 import ais.other.AINames;
 import board.GameState;
 import board.Parser;
@@ -14,17 +11,15 @@ import java.io.IOException;
 
 public class GameProcessor {
 
-    // headline for the logging
-    private String gameLog = "MoveNr.;activePlayer;fieldString;lastMove;bulletsCapturedWhite;bulletsCapturedBlack;timeRemainingWhite;timeRemainingBlack;timeUsedForLastMove\n";
-
+    private String gameLog;
     private int gameNumber;
-
     public GameState gameState;
 
     private NegamaxAIv1 negamaxAIV1 = new NegamaxAIv1();
     private NegamaxAIv2 negamaxAIV2 = new NegamaxAIv2();
     private NegamaxAIv3 negamaxAIV3 = new NegamaxAIv3();
     private NegamaxAIv4 negamaxAIV4 = new NegamaxAIv4();
+    private NegamaxAIv5 negamaxAIV5 = new NegamaxAIv5();
 
     public long timeRemainingWhite;
     public long timeRemainingBlack;
@@ -52,6 +47,7 @@ public class GameProcessor {
 
         negamaxAIV3.timeTotal = gameTime;
         negamaxAIV4.timeTotal = gameTime;
+        negamaxAIV5.timeTotal = gameTime;
 
         long[] bitmaps = createBitmaps(startingSetup);
         int startingPlayer = (whiteStarts ? 2 : 3);
@@ -111,6 +107,8 @@ public class GameProcessor {
             case NEGAMAXV3: newGameState = performMoveNegamaxAIV3(state, timeRemaining);
                 break;
             case NEGAMAXV4: newGameState = performMoveNegamaxAIV4(state, timeRemaining);
+                break;
+            case NEGAMAXV5: newGameState = performMoveNegamaxAIV5(state, timeRemaining);
                 break;
             default: newGameState = state;
         }
@@ -184,6 +182,17 @@ public class GameProcessor {
         return negamaxAIV4.performMove(state,timeRemaining);
     }
 
+    /**
+     * AI based on a negamax algorithm with alpha beta pruning, time management, dynamic depth for the negamax algorithm, transposition table and improved rating function.
+     *
+     * @param state current state
+     * @param timeRemaining time remaining
+     * @return the new state after the move
+     */
+    private GameState performMoveNegamaxAIV5(GameState state, long timeRemaining){
+        return negamaxAIV5.performMove(state,timeRemaining);
+    }
+
     // ########################################################## logs ##############################################################
 
     /**
@@ -200,6 +209,7 @@ public class GameProcessor {
      * @param player the starting player
      */
     private void firstLog(String position, int player){
+        gameLog += "MoveNr.;activePlayer;fieldString;lastMove;bulletsCapturedWhite;bulletsCapturedBlack;timeRemainingWhite;timeRemainingBlack;timeUsedForLastMove\n";
         gameLog += "1;" + player + ";" + position + ";;0;0;" + timeRemainingWhite + ";" + timeRemainingBlack + ";\n";
     }
 
@@ -229,6 +239,8 @@ public class GameProcessor {
                 break;
             case NEGAMAXV4: numberOfVisitedNodesWhite = negamaxAIV4.numberOfVisitedNodes;
                 break;
+            case NEGAMAXV5: numberOfVisitedNodesWhite = negamaxAIV5.numberOfVisitedNodes;
+                break;
         }
         switch (AIBlack) {
             case NEGAMAXV1: numberOfVisitedNodesBlack = negamaxAIV1.numberOfVisitedNodes;
@@ -238,6 +250,8 @@ public class GameProcessor {
             case NEGAMAXV3: numberOfVisitedNodesBlack = negamaxAIV3.numberOfVisitedNodes;
                 break;
             case NEGAMAXV4: numberOfVisitedNodesBlack = negamaxAIV4.numberOfVisitedNodes;
+                break;
+            case NEGAMAXV5: numberOfVisitedNodesBlack = negamaxAIV5.numberOfVisitedNodes;
                 break;
         }
     }

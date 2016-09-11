@@ -7,7 +7,7 @@ class Ratings {
     /**
      * weights to easily adjust the influence of the different rating forms
      */
-    private static final double[] weights = {1, 0.5, -1, 1};
+    private static final double[] weights = {1, 0.5, -1, 0.2};
     private static final int PLAYER_MULTIPLIER = 0;
     private static final int PREDOMINANCE_MULTIPLIER = 1;
     private static final int EDGE_RATING_MULTIPLIER = 2;
@@ -22,22 +22,19 @@ class Ratings {
      * @return heuristic rating value
      */
     static double rateState(GameState state, int color) {
-        // all rating functions check for white ratings, so black is -1 * this rating
-        int playerMultiplier = (color == 2 ? 1 : -1);
-
         // get all the different ratings
         double redBulletRating = bulletRating(state, color);
         double bulletPredominance = bulletPredominance(state.bitmaps, color);
 
         // weight them and add them
-        double rating = redBulletRating * weights[PLAYER_MULTIPLIER] + bulletPredominance * weights[PREDOMINANCE_MULTIPLIER];
-        return rating * playerMultiplier;
+        return redBulletRating * weights[PLAYER_MULTIPLIER] + bulletPredominance * weights[PREDOMINANCE_MULTIPLIER];
     }
 
     /**
      * bullet rating
      * bullet predominance
      * edge rating
+     * stick to last red bullet rating
      *
      * @param state current gameState
      * @param color active player
@@ -87,10 +84,10 @@ class Ratings {
     }
 
     /**
-     * If only one bullet remains, make sure to place a bullet next to it.
+     * If only one bullet remains, make sure to place an own bullet next to it.
      * @param bitmaps board representations
      * @param color active player
-     * @return 0 if there is more than 1 red bullet, -1 if no [color] bullet is in range of the last red bullet, and 1 if at least one is.
+     * @return 0 if there is more than 1 red bullet, -1 if no [color] bullet is right next to the last red bullet, and 1 if at least one is.
      */
     private static double stickToLastBullet(long[] bitmaps, int color) {
         if (Long.bitCount(bitmaps[1]) == 1) {
@@ -109,7 +106,7 @@ class Ratings {
      */
     private static boolean isNeighbor(long position, long bitboard){
         position <<= 4;
-        for (int i = 1; i < 9; i++) {
+        for (int i = 1; i < 10; i++) {
             if ((position & bitboard) != 0) {
                 return true;
             }
