@@ -88,6 +88,9 @@ public class Parser {
             case 6: string += "g";break;
             default: string += "ERROR";
         }
+        if ((Long.numberOfLeadingZeros(position) - 15) < 0) {
+            System.out.println(position);
+        }
         string+= ((Long.numberOfLeadingZeros(position) - 15) / 7 + 1);
         return string;
     }

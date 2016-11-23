@@ -1,4 +1,4 @@
-package ais.dummy;
+package ais;
 
 import board.GameState;
 import board.Move;

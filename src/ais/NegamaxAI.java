@@ -1,4 +1,4 @@
-package ais.negamax;
+package ais;
 
 import board.GameState;
 import board.Move;
@@ -12,18 +12,25 @@ import static java.lang.Double.min;
  * Same as V3, but with improved rating functions
  *
  */
-public class NegamaxAIv3 {
-    private int max_depth = 7;
-    private LinkedList<Move> bestMoves = new LinkedList<>();
-    public int numberOfVisitedNodes = 0;
+public class NegamaxAI {
+    private static final int AVERAGE_TURNS_PER_GAME = 60;
 
-    private static final int AVERAGE_TURNS_PER_GAME = 50;
+    private int current_max_depth = 7;
+    public int numberOfVisitedNodes = 0;
+    private LinkedList<Move> bestMoves = new LinkedList<>();
+
+    private AISettings settings;
 
     public long timeTotal;
     private long timeStarted;
     private long timeRemaining;
-
     private int activePlayer;
+    private Ratings ratings;
+
+    public NegamaxAI (AISettings settings) {
+        this.settings = settings;
+        this.ratings = new Ratings(settings.weights);
+    }
 
 
     public GameState performMove(GameState state, long timeRemaining) {
@@ -35,14 +42,17 @@ public class NegamaxAIv3 {
             state.gameWinner = (activePlayer == 2 ? 3 : 2);
         }
 
-        // Keep track of the time we spent already for this move to not use too much.
-        timeStarted = System.currentTimeMillis();
-
-        // Adjust the current max_depth based on the time used already and the time remaining.
-        setMaxDepth(timeRemaining, state.turn);
+        if (settings.timeManagementEnabled) {
+            // Keep track of the time we spent already for this move to not use too much.
+            timeStarted = System.currentTimeMillis();
+            // Adjust the current current_max_depth based on the time used already and the time remaining.
+            setMaxDepth(timeRemaining, state.turn);
+        } else {
+            current_max_depth = 5;
+        }
 
         // Perform the search for the best move with the negamax algorithm.
-        negamax(state, max_depth, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+        negamax(state, current_max_depth, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
         // Take a random move from all of the equal best moves.
         Move bestMove = bestMoves.get((int) (Math.random() * bestMoves.size()));
@@ -53,9 +63,9 @@ public class NegamaxAIv3 {
      * Negamax algorithm
      *
      * @param state current state
-     * @param depth goes from max_depth to 0
-     * @param alpha alpha
-     * @param beta beta
+     * @param depth goes from current_max_depth to 0
+     * @param alpha alpha, only if alpha beta pruning is enabled
+     * @param beta beta, only if alpha beta pruning is enabled
      * @return current heuristic rating
      */
     private double negamax(GameState state, int depth, double alpha, double beta) {
@@ -70,15 +80,18 @@ public class NegamaxAIv3 {
                 return -(1000 + depth * 100);
             }
         }
+
         // Rate if we found our depth goal.
-        // If the last move was a capture move, perform another iteration instead (maximum five times to not go too deep).
-        if ((depth <= 0 && !state.lastMove.isCaptureMove) || depth < -4) {
-            return Ratings.rateState(state, color);
+        // If the last move was a capture move and quiescence search is enabled, perform another iteration instead (maximum five times to not go too deep).
+        if ((depth <= 0 && !(state.lastMove.isCaptureMove && settings.quiescenceEnabled)) || depth < -4) {
+            return ratings.rateState(state, color);
         }
 
         double bestValue = Double.NEGATIVE_INFINITY;
         LinkedList<Move> moves = state.getAllMoves(state.activePlayer);
-        moves = sortMoves(moves);
+        if (settings.moveSortEnabled) {
+            moves = sortMoves(moves);
+        }
         for (Move move : moves) {
             double v;
 
@@ -89,16 +102,16 @@ public class NegamaxAIv3 {
                 v = negamax(state.executeMove(move), depth - 1, alpha, beta);
             }
 
-            // captureMoves weight more
-            if (move.isCaptureMove) {
-                double multiplier = (activePlayer == color ? 1.25 : 0.5);
+            // captureMoves are nearly always better, therefor they weight more
+            if (move.isCaptureMove && depth == current_max_depth) {
+                double multiplier = (activePlayer == color ? 1.5 : 0.5);
                 v *= multiplier;
             }
 
             // save all equally rated moves to make the movement choice non-deterministic
-            if (v == bestValue && depth == max_depth) {
+            if (v == bestValue && depth == current_max_depth) {
                 bestMoves.add(move);
-            } else if (v > bestValue && depth == max_depth) {
+            } else if (v > bestValue && depth == current_max_depth) {
                 bestMoves =  new LinkedList<>();
                 bestMoves.add(move);
                 bestValue = v;
@@ -106,14 +119,13 @@ public class NegamaxAIv3 {
             bestValue = max(bestValue, v);
             alpha = max(alpha, v);
 
-            // Stop the search if it's taking too much time.
-            boolean tooMuchTimeSpent = ((System.currentTimeMillis() - timeStarted) > 0.2 * timeRemaining);
-            if (tooMuchTimeSpent){
-                if (depth == max_depth) {
-                    max_depth--;
+            // If time management is enabled, stop the search if it's taking too much time.
+            if (settings.timeManagementEnabled && ((System.currentTimeMillis() - timeStarted) > 0.2 * timeRemaining) ){
+                if (depth == current_max_depth) {
+                    current_max_depth--;
                 }
                 break;
-            } else if (alpha > beta) {
+            } else if (alpha > beta && settings.alphaBetaPruningEnabled) {
                 break;
             }
         }
@@ -121,23 +133,27 @@ public class NegamaxAIv3 {
     }
 
     /**
-     * Increase/decrease the max_depth dynamically based on how much time we used already and how many further turns we expect to see.
-     * max_depth ranges from 7 to 9.
-     * Fixed max_depth at 6 if 10% or less time remains.
+     * Increase/decrease the current_max_depth dynamically based on how much time we used already and how many further turns we expect to see.
+     * current_max_depth ranges from 7 to 9.
+     * Fixed current_max_depth between 5 and 7 if 10% or less time remains.
      *
      * @param timeRemaining time remaining for the match in milliseconds
      * @param turn number of current turn
      */
     private void setMaxDepth(long timeRemaining, int turn) {
-        double percentageTimeUsed = 1 - (double) timeRemaining / (double) timeTotal;
+        double percentageTimeUsed = 1 - ((double) timeRemaining / (double) timeTotal);
         double estimatedTurnPercentage = min((double) turn / (double) AVERAGE_TURNS_PER_GAME, 1);
 
-        if (percentageTimeUsed > 0.9) {
-            max_depth = 6;
-        } else if (percentageTimeUsed < estimatedTurnPercentage * 0.8 && max_depth < 9) {
-            max_depth++;
-        } else if (percentageTimeUsed > estimatedTurnPercentage && max_depth > 7) {
-            max_depth--;
+        if (percentageTimeUsed > 0.995) {
+            current_max_depth = 5;
+        } else if (percentageTimeUsed > 0.98) {
+            current_max_depth = 6;
+        } else if (percentageTimeUsed > 0.9) {
+            current_max_depth = 7;
+        } else if (percentageTimeUsed < estimatedTurnPercentage * 0.9 && current_max_depth < 10) {
+            current_max_depth++;
+        } else if (percentageTimeUsed > estimatedTurnPercentage && current_max_depth > 8) {
+            current_max_depth--;
         }
     }
 

@@ -6,25 +6,33 @@ import board.Parser;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.LinkedList;
+
+import static board.Move.MoveDirection.DOWN;
 import static org.junit.Assert.*;
 
 public class GameStateTest {
-    GameState gameState;
-    String startingSetup = "0022003220103300111300111110001112033010223300002";
+    private GameState gameState;
+    private String startingSetup = "2200030220103300111030111110001110233010223300020";
 
     @Before
     public void setUp() throws Exception {
         gameState = new GameState(2);
         gameState.bitmaps = Parser.stringToBitboard(startingSetup);
         gameState.printField();
-        gameState = gameState.executeMove(new Move(68719476736L, Move.MoveDirection.DOWN));
-        gameState.printField();
-        gameState.executeMove(new Move(2L, Move.MoveDirection.UP)).printField();
-        System.out.println(gameState.lastMove.toString());
     }
 
+//    @Test
+//    public void testExecuteMove() {
+//        Move move = new Move(16384L, DOWN, false);
+//        GameState gameStateCopy = gameState.executeMove(move);
+//        gameStateCopy.printField();
+//        assertTrue(gameStateCopy.bitmaps[2] != gameState.bitmaps[2]);
+//    }
+
     @Test
-    public void testMoveRepetition() {
-        assertFalse(gameState.noRepetitiveMove(2L, Move.MoveDirection.UP));
+    public void stuff() {
+        int test = -4;
+        System.out.println(test % 7);
     }
 }

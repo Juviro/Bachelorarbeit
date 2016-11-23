@@ -36,7 +36,7 @@ public class Move {
      * @param direction direction in witch the bullet will get pushed
      * @param isCaptureMove true if the move throws an enemy or red bullet over the edge
      */
-    Move(final long positionFrom, final MoveDirection direction, boolean isCaptureMove) {
+    public Move(final long positionFrom, final MoveDirection direction, boolean isCaptureMove) {
         this.positionFrom = positionFrom;
         this.direction = direction;
         this.isCaptureMove = isCaptureMove;

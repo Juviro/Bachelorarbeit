@@ -82,7 +82,7 @@ public class GameState {
      * copy current gameState
      * @return the copy
      */
-    private GameState copy() {
+    public GameState copy() {
         GameState newState = new GameState(activePlayer);
         System.arraycopy(this.bitmaps, 0, newState.bitmaps, 0, bitmaps.length);
         newState.capturedBulletsBlack = this.capturedBulletsBlack;
@@ -323,10 +323,10 @@ public class GameState {
      * @param direction 'UP' stands for the top row, and so on
      * @return true if the position is on the edge of the board
      */
-    private boolean isOnEdge(long position, Move.MoveDirection direction) {
+    public static boolean isOnEdge(long position, Move.MoveDirection direction) {
         switch(direction) {
-            case UP: return (Long.numberOfLeadingZeros(position) > 15 && Long.numberOfLeadingZeros(position) < 23);
-            case DOWN: return (Long.numberOfLeadingZeros(position) > 55);
+            case UP: return (Long.numberOfLeadingZeros(position) > 14 && Long.numberOfLeadingZeros(position) < 22);
+            case DOWN: return (Long.numberOfLeadingZeros(position) > 57);
             case LEFT: return ((Long.numberOfLeadingZeros(position) - 15) % 7 == 0);
             case RIGHT: return ((Long.numberOfLeadingZeros(position) - 15) % 7 == 6);
         }
