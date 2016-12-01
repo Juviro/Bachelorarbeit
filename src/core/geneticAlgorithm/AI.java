@@ -75,7 +75,7 @@ class AI implements Comparable<AI> {
      * Calculates the fitness for the AI.
      * The fitness is a value between 0 and 1 and consists of 80% win-rate, 10% bullet difference and 10% red bullet difference.
      *
-     * @return
+     * @return the calculated fitness
      */
     public double getFitness() {
         double winRate = (((double) numberOfWins / 7)) * 0.8;

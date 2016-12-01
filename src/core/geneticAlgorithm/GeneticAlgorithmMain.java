@@ -22,8 +22,8 @@ public class GeneticAlgorithmMain {
     private static void processGames() {
         setWeights();
         AIs = Tournament.playTournament(AIs);
-        AIs.forEach(System.out::println);
         saveGenerationLog();
+        AIs.forEach(System.out::println);
         AIs = new LinkedList<>();
         processGames();
     }
