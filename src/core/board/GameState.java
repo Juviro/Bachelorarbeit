@@ -209,12 +209,10 @@ public class GameState {
      * @param color    color of the bullet (2: white, 3: black)
      * @return LinkedList of all possible moves
      */
-    // TODO: check repetitive moves; TODO: junit core.tests schreiben
-    // TODO: eigene kugeln werden runtergeschmissen; fixed, checken; scheint nicht zu gehen; TODO: junit core.tests schreiben; fixed jetzt aber wirklich (hoffentlich)
     private LinkedList<Move> possibleMoves(long position, int color) {
         LinkedList<Move> moves = new LinkedList<>();
-        // check up
-        //  check if field in the opposite direction is empty
+        // check 'up'
+        // check if field in the opposite direction is empty
         if ((position & (bitmaps[0] << 7)) == 0 && noRepetitiveMove(position, UP)) {
             // find the last bullet that would been moved
             long currentPosition = position;
@@ -232,8 +230,8 @@ public class GameState {
                 moves.add(new Move(position, UP));
             }
         }
-        // check down
-        //  check if field in the opposite direction is empty
+        // check 'down'
+        // check if field in the opposite direction is empty
         if ((position & (bitmaps[0] >> 7)) == 0 && noRepetitiveMove(position, DOWN)) {
             // find the last bullet that would been moved
             long currentPosition = position;
@@ -250,8 +248,8 @@ public class GameState {
                 moves.add(new Move(position, DOWN));
             }
         }
-        // check left
-        //  check if field in the opposite direction is empty
+        // check 'left'
+        // check if field in the opposite direction is empty
         if ((isOnEdge(position, RIGHT) || (bitmaps[0] & (position >> 1)) == 0) && noRepetitiveMove(position, LEFT)) {
             // find the last bullet that would been moved
             long currentPosition = position;
@@ -264,8 +262,8 @@ public class GameState {
                 moves.add(new Move(position, LEFT, true));
             }
         }
-        // check right
-        //  check if field in the opposite direction is empty
+        // check 'right'
+        // check if field in the opposite direction is empty
         if ((isOnEdge(position, LEFT) || (bitmaps[0] & (position << 1)) == 0) && noRepetitiveMove(position, RIGHT)) {
             // find the last bullet that would been moved
             long currentPosition = position;
@@ -317,10 +315,10 @@ public class GameState {
     }
 
     /**
-     * check if a position is on a specific outer row
+     * Check if a position is on a specific outer row.
      *
-     * @param position position
-     * @param direction 'UP' stands for the top row, and so on
+     * @param position position.
+     * @param direction 'UP' stands for the top row, and so on.
      * @return true if the position is on the edge of the core.board
      */
     private static boolean isOnEdge(long position, Move.MoveDirection direction) {
@@ -345,7 +343,7 @@ public class GameState {
     }
 
     /**
-     * Prints the current core.board to the console.
+     * Prints the current board to the console.
      */
     public void printField() {
         System.out.println("");

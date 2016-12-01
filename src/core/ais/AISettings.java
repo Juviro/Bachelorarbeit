@@ -1,6 +1,8 @@
 package core.ais;
 
 
+import java.util.Arrays;
+
 public class AISettings {
     public boolean alphaBetaPruningEnabled;
     public boolean moveSortEnabled;

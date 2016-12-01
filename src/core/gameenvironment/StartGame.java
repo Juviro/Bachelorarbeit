@@ -9,7 +9,7 @@ public class StartGame {
 //        String startingSetup = "2200033220103300111000111110001110033010223300022";
 //        long gameTime = 20000;
 //        boolean logGame = true;
-//        //new StartGame(numberOfGames, startingSetup, true, gameTime, AINames.AIs.NEGAMAXV1, AINames.AIs.NEGAMAXV2, logGame);
+//        //new StartGame(numberOfGames, startingSetup, true, gameTime, AINames.AI.NEGAMAXV1, AINames.AI.NEGAMAXV2, logGame);
 //    }
 
     public StartGame(int numberOfGames, String startingSetup, boolean whiteStarts, long gameTime, AISettings settingsWhite, AISettings settingsBlack, boolean logGame) {

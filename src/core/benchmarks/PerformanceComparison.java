@@ -7,7 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 /**
- * Compares the different states for the negamax AIs.
+ * Compares the different states for the negamax AI.
  */
 public class PerformanceComparison {
 
@@ -35,7 +35,7 @@ public class PerformanceComparison {
         long gameTime = 20000;
         String gameLog = "Game number;turns;winner;captured bullets white;captured bullets black;remaining bullets white; remaining bullets black;time remaining white; time remaining black; nodes visited white; nodes visited black\n";
         for (int i = 0; i < numberOfGames; i++) {
-            GameProcessor currentGame = new GameProcessor(startingSetup, whiteStarts, (i + 1),gameTime, settingsWhite, settingsBlack, true);
+            GameProcessor currentGame = new GameProcessor(startingSetup, whiteStarts, (i + 1), gameTime, settingsWhite, settingsBlack, true);
             whiteStarts = !whiteStarts;
             switch(currentGame.winner) {
                 case 2: wonGamesWhite++;break;

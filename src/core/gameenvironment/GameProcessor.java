@@ -35,7 +35,7 @@ public class GameProcessor {
     public GameProcessor(String startingSetup, boolean whiteStarts, int gameNumber, long gameTime, AISettings settingsWhite, AISettings settingsBlack, boolean logGames) {
         this.gameNumber = gameNumber;
 
-        // Initialize AIs
+        // Initialize AI
         AIWhite = new NegamaxAI(settingsWhite);
         AIBlack = new NegamaxAI(settingsBlack);
 
@@ -120,7 +120,7 @@ public class GameProcessor {
     }
 
 
-    // ########################################################## AIs ##############################################################
+    // ########################################################## AI ##############################################################
 
     /**
      * AI based on a negamax algorithm with alpha beta pruning, time management, dynamic depth for the negamax algorithm and improved rating function.

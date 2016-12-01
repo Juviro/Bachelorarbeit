@@ -62,7 +62,7 @@ public class Ratings {
 
     /**
      * Rates the position of the own bullets and the enemy bullets on the core.board. The closer to the mid the bullets are, the better.
-     * The rating is based on this core.board:
+     * The rating is based on this board:
      *
      * 1 1 1 1 1 1 1
      * 1 2 2 2 2 2 1

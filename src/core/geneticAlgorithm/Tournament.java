@@ -1,32 +1,39 @@
 package core.geneticAlgorithm;
 
 
+
 import core.ais.AISettings;
+import core.gameenvironment.GameProcessor;
+
+import java.util.LinkedList;
 
 class Tournament {
 
-    private static AISettings[] AIs = new AISettings[8];
+    private final static String startingSetup = "2200033220103300111000111110001110033010223300022";
+    private final static long gameTime = 20000;
+    private static int gameNumber = 0;
+
 
     /**
-     * Plays a round-robin tournament and stores the fitness values in double[].
+     * Plays a round-robin tournament and returns the same linked List that includes the tournament results.
      *
-     * @return double[] with the fitness values.
-     * @param weights weights for the AIs.
+     * @return LinkedList<AI> with the AIS.
+     * @param ais AIs.
      */
-    static double[] playTournament(double[][] weights) {
-        initAis(weights);
-        return null;
+    static LinkedList<AI> playTournament(LinkedList<AI> ais) {
+        for (int i = 0; i < 7; i++) {
+            for (int j = i + 1; j < 8; j++) {
+                AISettings settingsWhite = ais.get(i).getAiSettings();
+                AISettings settingsBlack = ais.get(j).getAiSettings();
+                GameProcessor currentGame = new GameProcessor(startingSetup, true, ++gameNumber, gameTime, settingsWhite, settingsBlack, true);
+                // save the results to the AI object
+                ais.get(i).setResults((currentGame.winner == 2), currentGame.gameState.capturedBulletsWhite - currentGame.gameState.capturedBulletsBlack, Long.bitCount(currentGame.gameState.bitmaps[2]) - Long.bitCount(currentGame.gameState.bitmaps[3]));
+                ais.get(j).setResults((currentGame.winner == 3), currentGame.gameState.capturedBulletsBlack - currentGame.gameState.capturedBulletsWhite, Long.bitCount(currentGame.gameState.bitmaps[3]) - Long.bitCount(currentGame.gameState.bitmaps[2]));
+            }
+        }
+
+        return ais;
     }
 
-    /**
-     * Creates the AI Objects.
-     * @param weights weights of all AIs.
-     */
-    private static void initAis(double[][] weights) {
-        for (int i = 0; i < 8; i++) {
-            double[] aiWeights = new double[4];
-            System.arraycopy(weights[i], 0, aiWeights, 0, 4);
-            AIs[i] = new AISettings(true, true, true, true, aiWeights);
-        }
-    }
+
 }
