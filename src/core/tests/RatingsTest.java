@@ -48,4 +48,19 @@ public class RatingsTest {
         long neighbour = 0b0000000000000001000000000000000000000000000000000L;
         assertTrue(Ratings.isNeighbor(position, neighbour));
     }
+    @Test
+    public void testCenterOfMass1() {
+        long bitboard = 0b1000001000000000000000000000000000000000001000001L;
+        assertTrue(Ratings.centerOfMass(bitboard) == Math.sqrt(18));
+    }
+    @Test
+    public void testCenterOfMass2() {
+        long bitboard = 0b0000000000000000000000000000000000000000001000001L;
+        assertTrue(Ratings.centerOfMass(bitboard) == Math.sqrt(18) - 3);
+    }
+    @Test
+    public void testCenterOfMass3() {
+        long bitboard = 0b0000000000000000000000000000000000000000000000001L;
+        assertTrue(Ratings.centerOfMass(bitboard) == 0);
+    }
 }
