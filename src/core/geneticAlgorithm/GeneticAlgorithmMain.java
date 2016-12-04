@@ -194,6 +194,7 @@ public class GeneticAlgorithmMain {
         // make sure the mutationRate is between 0 and 0.15
         mutationRate = Math.max(Math.min(mutationRate, 0.15), 0);
         // 68.2 * 15 = 0b1111111111
+        d += 7.5;
         long mutant = (long) (d * 68.2);
         long position = 0b1000000000L;
         for (int i = 1; i < 11; i++) {
@@ -203,7 +204,9 @@ public class GeneticAlgorithmMain {
             }
             position >>= 1;
         }
-        return mutant / 68.2;
+        double result = mutant / 68.2;
+        result -= 7.5;
+        return result;
     }
 
 
@@ -246,10 +249,10 @@ public class GeneticAlgorithmMain {
      */
     private static void initializeAis() {
         for (int i = 0; i < 8; i++) {
-            double redBulletRating = Math.random() * 15;
-            double bulletPredominance = Math.random() * 15;
-            double placementRating = Math.random() * 15;
-            double stickRating = Math.random() * 15;
+            double redBulletRating = Math.random() * 15 - 7.5;
+            double bulletPredominance = Math.random() * 15 - 7.5;
+            double placementRating = Math.random() * 15 - 7.5;
+            double stickRating = Math.random() * 15 - 7.5;
             AI ai = new AI(redBulletRating, bulletPredominance, placementRating, stickRating, AI.aiType.randomAI);
             AIs.add(ai);
         }

@@ -100,6 +100,7 @@ class AI implements Comparable<AI> {
     @Override
     public String toString() {
         return "AI{" +
+                "fitness=" + getFitness() +
                 "numberOfWins=" + numberOfWins +
                 ", averageBulletDifference=" + averageBulletDifference +
                 ", averageRedBulletDifference=" + averageRedBulletDifference +
