@@ -1,14 +1,12 @@
 package core.ais;
 
 
-import java.util.Arrays;
-
 public class AISettings {
     public boolean alphaBetaPruningEnabled;
     public boolean moveSortEnabled;
     public boolean timeManagementEnabled;
     public boolean quiescenceEnabled;
-    public double[] weights;
+    double[] weights;
 
     public AISettings(boolean alphaBetaPruningEnabled, boolean moveSortEnabled, boolean timeManagementEnabled, boolean quiescenceEnabled, double[] weights) {
         this.alphaBetaPruningEnabled = alphaBetaPruningEnabled;

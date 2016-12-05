@@ -1,7 +1,5 @@
 package core.geneticAlgorithm;
 
-
-
 import core.ais.AISettings;
 import core.gameenvironment.GameProcessor;
 
@@ -11,7 +9,6 @@ class Tournament {
 
     private final static String startingSetup = "2200033220103300111000111110001110033010223300022";
     private final static long gameTime = 20000;
-    private static int tournamentNumber = 1;
 
 
     /**
@@ -32,7 +29,6 @@ class Tournament {
                 ais.get(j).setResults((currentGame.winner == 3), currentGame.gameState.capturedBulletsBlack - currentGame.gameState.capturedBulletsWhite, Long.bitCount(currentGame.gameState.bitmaps[3]) - Long.bitCount(currentGame.gameState.bitmaps[2]));
             }
         }
-        tournamentNumber++;
         return ais;
     }
 

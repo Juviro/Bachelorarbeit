@@ -21,7 +21,7 @@ public class Parser {
         return bitmaps;
     }
 
-    public static String bitboardToString(long[] bitboards) {
+    public static String bitBoardToString(long[] bitboards) {
         String string = "";
         // start at position 49
         long position = 0x1000000000000L;
@@ -40,7 +40,7 @@ public class Parser {
         return string;
     }
 
-    static char[][] bitboardsToArray(GameState state) {
+    static char[][] bitBoardsToArray(GameState state) {
         char[][] board = new char[7][7];
         long position = 0x1000000000000L;
         for (int i = 0; i < GameState.NUMBER_OF_FIELDS; i++) {
@@ -86,7 +86,6 @@ public class Parser {
             case 4: string += "e";break;
             case 5: string += "f";break;
             case 6: string += "g";break;
-            default: string += "ERROR";
         }
         if ((Long.numberOfLeadingZeros(position) - 15) < 0) {
             System.out.println(position);

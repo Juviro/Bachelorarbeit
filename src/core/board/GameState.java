@@ -348,7 +348,7 @@ public class GameState {
     public void printField() {
         System.out.println("");
         System.out.println("-------------");
-        char[][] board = Parser.bitboardsToArray(this);
+        char[][] board = Parser.bitBoardsToArray(this);
         for (int i = 0; i < 7; i++) {
             for (int j = 0; j < 7; j++) {
                 System.out.print(board[i][j] + " ");

@@ -17,6 +17,7 @@ class AI implements Comparable<AI> {
     private AISettings aiSettings;
 
     /*
+    // TODO überarbeiten
      Enum to distinguish the different AI types.
      randomAI: completely random values, only appears in the very first generation.
      parentAI: the AIs with the highest fitness from the last generation.
@@ -46,11 +47,11 @@ class AI implements Comparable<AI> {
     }
 
 
-    public int getNumberOfWins() {
+    int getNumberOfWins() {
         return numberOfWins;
     }
 
-    public double getAverageBulletRate() {
+    double getAverageBulletRate() {
         return averageBulletDifference;
     }
 
@@ -59,7 +60,7 @@ class AI implements Comparable<AI> {
     }
 
 
-    public double[] getWeights() {
+    double[] getWeights() {
         return weights;
     }
 

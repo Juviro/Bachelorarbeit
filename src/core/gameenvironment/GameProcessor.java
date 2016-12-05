@@ -140,7 +140,7 @@ public class GameProcessor {
      * @param gameState current state
      */
     private void logState(GameState gameState) {
-        gameLog += (gameState.turn + 1) + ";" + gameState.activePlayer + ";" + Parser.bitboardToString(gameState.bitmaps) + ";" + Parser.moveToString(gameState.lastMove) + ";" + gameState.capturedBulletsWhite + ";" + gameState.capturedBulletsBlack + ";" + timeRemainingWhite + ";" + timeRemainingBlack + ";" + timeUsedForLastMove + "\n";
+        gameLog += (gameState.turn + 1) + ";" + gameState.activePlayer + ";" + Parser.bitBoardToString(gameState.bitmaps) + ";" + Parser.moveToString(gameState.lastMove) + ";" + gameState.capturedBulletsWhite + ";" + gameState.capturedBulletsBlack + ";" + timeRemainingWhite + ";" + timeRemainingBlack + ";" + timeUsedForLastMove + "\n";
     }
 
     /**

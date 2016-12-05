@@ -63,4 +63,31 @@ public class RatingsTest {
         long bitboard = 0b0000000000000000000000000000000000000000000000001L;
         assertTrue(Ratings.centerOfMass(bitboard) == 0);
     }
+    @Test
+    public void testLibertyRating1() {
+        long bitboard1 = 0b0000000000000000000000000000000001000001110000011L;
+        long bitboard2 = 0b0000000000000000000000000000000000000000100000001L;
+        long[] bitBoards = new long[2];
+        bitBoards[0] = bitboard1;
+        bitBoards[1] = bitboard2;
+        assertTrue(Ratings.bulletLibertyRating(bitBoards, 1) == 0.5);
+    }
+    @Test
+    public void testLibertyRating2() {
+        long bitboard1 = 0b0000000000000000000000000000000001000001110000011L;
+        long bitboard2 = 0b0000000000000000000000000000000000000000100000000L;
+        long[] bitBoards = new long[2];
+        bitBoards[0] = bitboard1;
+        bitBoards[1] = bitboard2;
+        assertTrue(Ratings.bulletLibertyRating(bitBoards, 1) == 0);
+    }
+    @Test
+    public void testLibertyRating3() {
+        long bitboard1 = 0b0000000000000001000000000000000001000001100000011L;
+        long bitboard2 = 0b0000000000000001000000000000000000000000100000001L;
+        long[] bitBoards = new long[2];
+        bitBoards[0] = bitboard1;
+        bitBoards[1] = bitboard2;
+        assertTrue(Ratings.bulletLibertyRating(bitBoards, 1) == 1);
+    }
 }
