@@ -12,7 +12,7 @@ class AI implements Comparable<AI> {
     private double averageBulletDifference = 0;
     // average of red bullets captured - red bullets captured by the enemy
     private double averageRedBulletDifference = 0;
-    private double[] weights = new double[4];
+    private double[] weights = new double[6];
     private aiType aitype;
     private AISettings aiSettings;
 
@@ -29,11 +29,13 @@ class AI implements Comparable<AI> {
     }
 
 
-    AI(double redBulletRating, double bulletPredominance, double placementRating, double stickRating, aiType aitype) {
+    AI(double redBulletRating, double bulletPredominance, double placementRating, double stickRating, double massRating, double libertyRating, aiType aitype) {
         this.weights[0] = redBulletRating;
         this.weights[1] = bulletPredominance;
         this.weights[2] = placementRating;
         this.weights[3] = stickRating;
+        this.weights[4] = massRating;
+        this.weights[5] = libertyRating;
         this.aiSettings = new AISettings(true, true, true, true, weights);
         this.aitype = aitype;
     }

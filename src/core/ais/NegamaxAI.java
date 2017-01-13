@@ -75,9 +75,9 @@ public class NegamaxAI {
         // If the game is over, return a high value. This value is increased based on how deep we're currently.
         if (state.gameWinner != -1) {
             if (state.gameWinner == color) {
-                return 1000 + depth * 100;
+                return 100000 + depth * 10000;
             } else {
-                return -(1000 + depth * 100);
+                return -(100000 + depth * 10000);
             }
         }
 
