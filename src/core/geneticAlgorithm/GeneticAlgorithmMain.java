@@ -21,6 +21,7 @@ public class GeneticAlgorithmMain {
      */
     private static void processGames() {
         setWeights();
+        fixParam(0);
         AIs = Tournament.playTournament(AIs);
         saveGenerationLog();
         AIs.forEach(System.out::println);
@@ -192,7 +193,7 @@ public class GeneticAlgorithmMain {
      * @param mutationRate mutation
      * @return mutated double
      */
-    private static double mutateDouble(double d, double mutationRate) {
+    public static double mutateDouble(double d, double mutationRate) {
         // make sure the mutationRate is between 0 and 0.15
         mutationRate = Math.max(Math.min(mutationRate, 0.15), 0);
         d += 511;
@@ -260,5 +261,9 @@ public class GeneticAlgorithmMain {
             AI ai = new AI(redBulletRating, bulletPredominance, placementRating, stickRating, massRating, libertyRating, AI.aiType.randomAI);
             AIs.add(ai);
         }
+    }
+
+    private static void fixParam(int index) {
+        AIs.forEach(ai -> ai.setValue(index, 512));
     }
 }
