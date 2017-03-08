@@ -12,13 +12,12 @@ import java.io.IOException;
 public class PerformanceComparison {
 
     public static void main (String[] args) {
-        int numberOfGames = 1000;
-        boolean whiteStarts = true;
+        int numberOfGames = 10;
 
         AISettings settingsWhite = new AISettings(false, false, false, false);
         AISettings settingsBlack = new AISettings(true, true, true, true);
 
-        compareAIs(settingsWhite, settingsBlack, numberOfGames, whiteStarts);
+        compareAIs(settingsWhite, settingsBlack, numberOfGames, true);
     }
 
 
