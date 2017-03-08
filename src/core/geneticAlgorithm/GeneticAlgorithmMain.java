@@ -33,6 +33,7 @@ public class GeneticAlgorithmMain {
      * Sets the weights for the eight AIs of a single generation.
      * At first, tries to find the last existing csv file to get the weights out of it.
      * If there is no previous .csv, generates random values for the AIs.
+     *
      */
     private static void setWeights() {
         // get the file of the last generation
