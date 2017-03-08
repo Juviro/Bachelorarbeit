@@ -159,7 +159,7 @@ public class GameProcessor {
     private void saveLog() {
         FileWriter writer;
         try {
-            writer = new FileWriter("logs/game" + gameNumber + ".csv");
+            writer = new FileWriter(System.getProperty("user.home") + "/Dropbox/Bachelorarbeit/GeneticAlgorithm/logs/game" + gameNumber + ".csv");
             writer.append(gameLog);
 
             writer.flush();
