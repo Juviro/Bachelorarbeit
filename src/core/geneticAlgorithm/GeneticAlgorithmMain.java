@@ -174,8 +174,8 @@ public class GeneticAlgorithmMain {
         for (int i = 0; i < 6; i++) {
             double mutateRate1 = Math.random() * 0.05 + 0.05;
             double mutateRate2 = Math.random() * 0.05 + 0.05;
-            mutateDouble(ai1[i], mutateRate1);
-            mutateDouble(ai2[i], mutateRate2);
+            ai1[i] = mutateDouble(ai1[i], mutateRate1);
+            ai2[i] = mutateDouble(ai2[i], mutateRate2);
         }
 
         AIs.add(new AI(ai1[0],ai1[1], ai1[2], ai1[3], ai1[4], ai1[5], AI.aiType.mutantOther));
