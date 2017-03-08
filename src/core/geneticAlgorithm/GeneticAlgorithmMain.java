@@ -7,8 +7,6 @@ import java.util.LinkedList;
 
 public class GeneticAlgorithmMain {
 
-    // TODO auf neue parameter umschreiben
-
     private static LinkedList<AI> AIs = new LinkedList<>();
     private static int lastGameFileIndex = 0;
 
@@ -38,7 +36,7 @@ public class GeneticAlgorithmMain {
      */
     private static void setWeights() {
         // get the file of the last generation
-        while(new File("./GeneticAlgorithm/gen" + (lastGameFileIndex + 1) + ".csv").isFile()) {
+        while(new File(System.getProperty("user.home") + "/Dropbox/Bachelorarbeit/GeneticAlgorithm/gen" + (lastGameFileIndex + 1) + ".csv").isFile()) {
             lastGameFileIndex++;
         }
         // initialize AI with random values if there is no previous generation
@@ -59,7 +57,7 @@ public class GeneticAlgorithmMain {
      */
     private static void generateAIs() {
         try {
-            File file = new File("./GeneticAlgorithm/gen" + lastGameFileIndex + ".csv") ;
+            File file = new File(System.getProperty("user.home") + "/Dropbox/Bachelorarbeit/GeneticAlgorithm/gen" + lastGameFileIndex + ".csv") ;
             FileInputStream fis = new FileInputStream(file);
             BufferedReader br = new BufferedReader(new InputStreamReader(fis));
 
@@ -162,14 +160,14 @@ public class GeneticAlgorithmMain {
         for (int i = 0; i < (Math.min(param1, param2)); i++) {
             br.readLine();
         }
-        String ai = br.readLine();
+        String a1 = br.readLine();
         for (int i = 0; i < (Math.max(param1, param2) - (Math.min(param1, param2) + 1)); i++) {
             br.readLine();
         }
         String a2 = br.readLine();
 
 
-        double[] ai1 = Arrays.stream(Arrays.copyOfRange(ai.split(";"), 5, 11)).mapToDouble(Double::parseDouble).toArray();
+        double[] ai1 = Arrays.stream(Arrays.copyOfRange(a1.split(";"), 5, 11)).mapToDouble(Double::parseDouble).toArray();
         double[] ai2 = Arrays.stream(Arrays.copyOfRange(a2.split(";"), 5, 11)).mapToDouble(Double::parseDouble).toArray();
 
         for (int i = 0; i < 6; i++) {
@@ -218,7 +216,7 @@ public class GeneticAlgorithmMain {
         String gameLog = createLog();
         FileWriter writer;
         try {
-            writer = new FileWriter("./GeneticAlgorithm/gen" + (lastGameFileIndex + 1) + ".csv");
+            writer = new FileWriter(System.getProperty("user.home") + "/Dropbox/Bachelorarbeit/GeneticAlgorithm/gen" + (lastGameFileIndex + 1) + ".csv");
             writer.append(gameLog);
             writer.flush();
             writer.close();

@@ -133,7 +133,7 @@ public class NegamaxAI {
     }
 
     /**
-     * Increase/decrease the current_max_depth dynamically based on how much time we used already and how many further turns we expect to see.
+     * Increase/decrease the current_max_depth dynamically based on how much time has been used already and how many further turns are expect to be played.
      * current_max_depth ranges from 7 to 9.
      * Fixed current_max_depth between 5 and 7 if 10% or less time remains.
      *
@@ -150,7 +150,7 @@ public class NegamaxAI {
             current_max_depth = 6;
         } else if (percentageTimeUsed > 0.9) {
             current_max_depth = 7;
-        } else if (percentageTimeUsed < estimatedTurnPercentage * 0.9 && current_max_depth < 10) {
+        } else if (percentageTimeUsed < estimatedTurnPercentage * 0.9 && current_max_depth < 9) {
             current_max_depth++;
         } else if (percentageTimeUsed > estimatedTurnPercentage && current_max_depth > 8) {
             current_max_depth--;

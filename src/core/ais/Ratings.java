@@ -36,8 +36,9 @@ public class Ratings {
         double bulletPredominance = (weights[PREDOMINANCE_MULTIPLIER] != 0 ? bulletPredominance(state.bitmaps, color) : 0);
         double placementRating = (weights[PLACEMENT_RATING_MULTIPLIER] != 0 ? bulletPlacementRating(state.bitmaps[color], state.bitmaps[enemyColor]) : 0);
         double stickRating = (weights[STICK_RATING_MULTIPLIER] != 0 ? stickToLastBullet(state.bitmaps, color) : 0);
-        double centerOfMassRating = (weights[CENTER_OF_MASS_MULTIPLIER] != 0 ? centerOfMass(state.bitmaps[color]) : 0);
-        double libertyRating = (weights[LIBERTY_RATING_MULTIPLIER] != 0 ? bulletLibertyRating(state.bitmaps, color) : 0);
+        double centerOfMassRating = (weights[CENTER_OF_MASS_MULTIPLIER] != 0 ? centerOfMass(state.bitmaps[color], state.bitmaps[enemyColor]) : 0);
+        double libertyRating = (weights[LIBERTY_RATING_MULTIPLIER] != 0 ? bulletLibertyRating(state.bitmaps, color, enemyColor) : 0);
+
 
         // weight and add them
         return redBulletRating * weights[PLAYER_MULTIPLIER] + bulletPredominance * weights[PREDOMINANCE_MULTIPLIER] + placementRating * weights[PLACEMENT_RATING_MULTIPLIER] + stickRating * weights[STICK_RATING_MULTIPLIER] + centerOfMassRating * weights[CENTER_OF_MASS_MULTIPLIER] + libertyRating * weights[LIBERTY_RATING_MULTIPLIER];
@@ -105,52 +106,77 @@ public class Ratings {
      * Calculates the distance of the center of mass for the own bullets to the center of the board.
      * The distance is between 0 and sqrt(18) and the function returns sqrt(18) - the distance.
      *
-     * @param bitmap Representation of the own bullets on the board.
-     * @return sqrt(18) - the distance of the center of mass to the middle (0 - sqrt(18))
+     * @param ownBitmap Representation of the own bullets on the board.
+     * @param enemyBitmap Representation of the enemy bullets on the board.
+     * @return enemy distance to center - own distance to center
      */
-    public static double centerOfMass(long bitmap) {
+    public static double centerOfMass(long ownBitmap, long enemyBitmap) {
         long position = 1;
-        int sumX = 0;
-        int sumY = 0;
-        int numberOfBullets = Long.bitCount(bitmap);
+        int sumXOwn = 0;
+        int sumYOwn = 0;
+        int sumXEnemy = 0;
+        int sumYEnemy = 0;
+        int numberOfOwnBullets = Long.bitCount(ownBitmap);
+        int numberOfEnemyBullets = Long.bitCount(enemyBitmap);
         for (int i = 7; i > 0; i--) {
             for (int j = 7; j > 0; j--) {
-                if ((bitmap & position) != 0) {
-                    sumX += j;
-                    sumY += i;
+                if ((ownBitmap & position) != 0) {
+                    sumXOwn += j;
+                    sumYOwn += i;
+                }
+                if ((enemyBitmap & position) != 0) {
+                    sumXEnemy += j;
+                    sumYEnemy += i;
                 }
                 position <<= 1;
             }
         }
-        double distanceToCenter = Math.sqrt(Math.pow(4 - (double) sumX / numberOfBullets, 2) + Math.pow(4 - (double) sumY / numberOfBullets, 2));
-        return Math.sqrt(18) - distanceToCenter;
+        double distanceToCenterOwn = Math.sqrt(Math.pow(4 - (double) sumXOwn / numberOfOwnBullets, 2) + Math.pow(4 - (double) sumYOwn / numberOfOwnBullets, 2));
+        double distanceToCenterEnemy = Math.sqrt(Math.pow(4 - (double) sumXEnemy / numberOfEnemyBullets, 2) + Math.pow(4 - (double) sumYEnemy / numberOfEnemyBullets, 2));
+        return distanceToCenterEnemy - distanceToCenterOwn;
     }
 
 
     /**
-     * Returns the percentage value of own bullets with at least one liberty.
+     * Calculates the percentage value of own bullets with at least one liberty minus the same for the enemy.
      *
      * @param bitmaps board representation
-     * @return % of own bullets that have at least one liberty
+     * @param color own color
+     * @param enemyColor enemy color
+     * @return % of own bullets that have at least one liberty - % of enemy bullets that have at least one liberty
      */
-    public static double bulletLibertyRating(long[] bitmaps, int color) {
+    public static double bulletLibertyRating(long[] bitmaps, int color, int enemyColor) {
         long position = 1;
-        int numberOfBullets = Long.bitCount(bitmaps[color]);
-        int numberOfBulletsWithLiberties = 0;
+        int numberOfOwnBullets = Long.bitCount(bitmaps[color]);
+        int numberOfOwnBulletsWithLiberties = 0;
+        int numberOfEnemyBullets = Long.bitCount(bitmaps[color]);
+        int numberOfEnemyBulletsWithLiberties = 0;
+
         for (int i = 7; i > 0; i--) {
             for (int j = 7; j > 0; j--) {
                 if ((bitmaps[color] & position) != 0) {
                     // if the bullet is on the edge, there is always at least one liberty
                     if (i == 7 || i == 1 || j == 7 || j == 1) {
-                        numberOfBulletsWithLiberties++;
+                        numberOfOwnBulletsWithLiberties++;
                     } else if ((position >> 1 & bitmaps[0]) == 0 || (position >> 7 & bitmaps[0]) == 0 || (position << 1 & bitmaps[0]) == 0 || (position << 7 & bitmaps[0]) == 0) {
-                        numberOfBulletsWithLiberties++;
+                        numberOfOwnBulletsWithLiberties++;
+                    }
+                } else if ((bitmaps[enemyColor] & position) != 0) {
+                    // if the bullet is on the edge, there is always at least one liberty
+                    if (i == 7 || i == 1 || j == 7 || j == 1) {
+                        numberOfEnemyBulletsWithLiberties++;
+                    } else if ((position >> 1 & bitmaps[0]) == 0 || (position >> 7 & bitmaps[0]) == 0 || (position << 1 & bitmaps[0]) == 0 || (position << 7 & bitmaps[0]) == 0) {
+                        numberOfEnemyBulletsWithLiberties++;
                     }
                 }
                 position <<= 1;
             }
         }
-        return (double) numberOfBulletsWithLiberties / numberOfBullets;
+
+        double ownPercentage = numberOfOwnBulletsWithLiberties / numberOfOwnBullets;
+        double enemyPercentage = numberOfEnemyBulletsWithLiberties / numberOfEnemyBullets;
+
+        return ownPercentage - enemyPercentage;
     }
 
 

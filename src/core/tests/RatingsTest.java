@@ -50,44 +50,53 @@ public class RatingsTest {
     }
     @Test
     public void testCenterOfMass1() {
-        long bitboard = 0b1000001000000000000000000000000000000000001000001L;
-        assertTrue(Ratings.centerOfMass(bitboard) == Math.sqrt(18));
+        long bitboard1 = 0b1000001000000000000000000000000000000000001000001L;
+        long bitboard2 = 0b1000001000000000000000000000000000000000001000001L;
+        assertTrue(Ratings.centerOfMass(bitboard1, bitboard2) == 0);
     }
     @Test
     public void testCenterOfMass2() {
-        long bitboard = 0b0000000000000000000000000000000000000000001000001L;
-        assertTrue(Ratings.centerOfMass(bitboard) == Math.sqrt(18) - 3);
+        long bitboard1 = 0b1000001000000000000000000000000000000000001000001L;
+        long bitboard2 = 0b1000000000000000000000000000000000000000000000000L;
+        assertTrue(Ratings.centerOfMass(bitboard1, bitboard2) == Math.sqrt(18));
     }
     @Test
     public void testCenterOfMass3() {
-        long bitboard = 0b0000000000000000000000000000000000000000000000001L;
-        assertTrue(Ratings.centerOfMass(bitboard) == 0);
+        long bitboard1 = 0b1000001000000000000000000000000000000000001000001L;
+        long bitboard2 = 0b1000001000000000000000000000000000000000001000001L;
+        assertTrue(Ratings.centerOfMass(bitboard1, bitboard2) == 0);
     }
     @Test
     public void testLibertyRating1() {
-        long bitboard1 = 0b0000000000000000000000000000000001000001110000011L;
+        long bitboard1 = 0b1000000000000000000000000000000001000001110000011L;
         long bitboard2 = 0b0000000000000000000000000000000000000000100000001L;
-        long[] bitBoards = new long[2];
+        long bitboard3 = 0b1000000000000000000000000000000000000000000000001L;
+        long[] bitBoards = new long[3];
         bitBoards[0] = bitboard1;
         bitBoards[1] = bitboard2;
-        assertTrue(Ratings.bulletLibertyRating(bitBoards, 1) == 0.5);
+        bitBoards[2] = bitboard3;
+        assertTrue(Ratings.bulletLibertyRating(bitBoards, 1, 2) == 0.5);
     }
     @Test
     public void testLibertyRating2() {
-        long bitboard1 = 0b0000000000000000000000000000000001000001110000011L;
+        long bitboard1 = 0b1000000000000000000000000000000001000001110000011L;
         long bitboard2 = 0b0000000000000000000000000000000000000000100000000L;
-        long[] bitBoards = new long[2];
+        long bitboard3 = 0b1000000000000000000000000000000000000000000000000L;
+        long[] bitBoards = new long[3];
         bitBoards[0] = bitboard1;
         bitBoards[1] = bitboard2;
-        assertTrue(Ratings.bulletLibertyRating(bitBoards, 1) == 0);
+        bitBoards[2] = bitboard3;
+        assertTrue(Ratings.bulletLibertyRating(bitBoards, 1, 2) == 0);
     }
     @Test
     public void testLibertyRating3() {
-        long bitboard1 = 0b0000000000000001000000000000000001000001100000011L;
+        long bitboard1 = 0b1000000000000001000000000000000001000001100000011L;
         long bitboard2 = 0b0000000000000001000000000000000000000000100000001L;
-        long[] bitBoards = new long[2];
+        long bitboard3 = 0b1000000000000001000000000000000000000000000000000L;
+        long[] bitBoards = new long[3];
         bitBoards[0] = bitboard1;
         bitBoards[1] = bitboard2;
-        assertTrue(Ratings.bulletLibertyRating(bitBoards, 1) == 1);
+        bitBoards[2] = bitboard3;
+        assertTrue(Ratings.bulletLibertyRating(bitBoards, 1, 2) == 1);
     }
 }
