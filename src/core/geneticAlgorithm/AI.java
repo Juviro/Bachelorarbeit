@@ -88,6 +88,10 @@ class AI implements Comparable<AI> {
         return winRate + bulletDifference + redBulletDifference;
     }
 
+    void setValue(int index, double value) {
+        weights[index] = value;
+    }
+
     @Override
     public int compareTo(AI o) {
         double comparedFitness = o.getFitness();

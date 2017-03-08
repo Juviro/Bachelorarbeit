@@ -3,6 +3,7 @@ package core.tests;
 import core.board.GameState;
 import core.board.Move;
 import core.board.Parser;
+import core.geneticAlgorithm.GeneticAlgorithmMain;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,7 +18,7 @@ public class GameStateTest {
     public void setUp() throws Exception {
         gameState = new GameState(2);
         gameState.bitmaps = Parser.stringToBitboard(startingSetup);
-        gameState.printField();
+        //gameState.printField();
     }
 
     @Test
@@ -26,5 +27,18 @@ public class GameStateTest {
         GameState gameStateCopy = gameState.executeMove(move);
         gameStateCopy.printField();
         assertTrue(gameStateCopy.bitmaps[2] != gameState.bitmaps[2]);
+    }
+
+    @Test
+    public void testAvgDiff() {
+        int diff = 0;
+        for (int i = 0; i < 100000; i++) {
+            int num = (int) (Math.random() * 1024);
+            num -= 512;
+            int mutant = (int) GeneticAlgorithmMain.mutateDouble(num, 0.01);
+            diff += Math.abs(num - mutant);
+            //System.out.println(num + " -> " + mutant );
+        }
+        System.out.println("avg diff = " + diff / 100000);
     }
 }

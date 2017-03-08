@@ -104,7 +104,7 @@ public class Ratings {
 
     /**
      * Calculates the distance of the center of mass for the own bullets to the center of the board.
-     * The distance is between 0 and sqrt(18) and the function returns sqrt(18) - the distance.
+     * The distance is between 0 and sqrt(18) and the function returns enemy distance to center - own distance to center.
      *
      * @param ownBitmap Representation of the own bullets on the board.
      * @param enemyBitmap Representation of the enemy bullets on the board.
