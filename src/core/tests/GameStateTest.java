@@ -7,6 +7,8 @@ import core.geneticAlgorithm.GeneticAlgorithmMain;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.LinkedList;
+
 import static core.board.Move.MoveDirection.DOWN;
 import static org.junit.Assert.assertTrue;
 
@@ -40,5 +42,22 @@ public class GameStateTest {
             //System.out.println(num + " -> " + mutant );
         }
         System.out.println("avg diff = " + diff / 100000);
+    }
+
+    @Test public void testPossibleMoves() {
+        String position = "2200000010130003211300021130201003230110123000020";
+        gameState = new GameState(2);
+        gameState.bitmaps = Parser.stringToBitboard(position);
+        //gameState.printField();
+        //LinkedList<Move> moves = gameState.getAllMoves(2);
+        // moves.forEach(System.out::println);
+        Move move = new Move(1048576L, DOWN, true);
+        gameState = gameState.executeMove(move);
+        gameState.printStats();
+        gameState.printField();
+    }
+
+    @Test public void testIsOnEdge() {
+        assertTrue(GameState.isOnEdge(64, DOWN));
     }
 }

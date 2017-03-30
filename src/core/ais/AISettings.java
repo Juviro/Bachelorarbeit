@@ -21,6 +21,6 @@ public class AISettings {
         this.moveSortEnabled = moveSortEnabled;
         this.timeManagementEnabled = timeManagementEnabled;
         this.quiescenceEnabled = quiescenceEnabled;
-        this.weights = new double[] {1, 0.5, 1, 0.5, 0.5, 1};
+        this.weights = new double[] {1, 0.5, 1, 0.5, 0.5, 1, 1};
     }
 }

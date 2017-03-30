@@ -52,10 +52,9 @@ public class GameProcessor {
         // initialize the game
         gameState = new GameState(startingPlayer);
         gameState.bitmaps = bitmaps;
-        int player = (whiteStarts ? 2 : 3);
 
         // log the starting setup
-        firstLog(startingSetup, player);
+        firstLog(startingSetup, startingPlayer);
 
         // start the game and play it until it's over
         while (gameState.gameWinner == -1) {

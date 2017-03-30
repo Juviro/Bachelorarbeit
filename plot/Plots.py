@@ -14,7 +14,7 @@ for j in range (0, 5):
     y_axis = []
     x_axis = []
     
-    name_array = ['fitness', 'aiType', 'gamesWon', 'averageRedBulletDifference', 'averageBulletDifference', 'redBulletRating', 'bulletPredominanceRating', 'placementRating', 'stickRating']
+    name_array = ['fitness', 'aiType', 'gamesWon', 'averageRedBulletDifference', 'averageBulletDifference', 'redBulletRating', 'bulletPredominanceRating', 'placementRating', 'turnRating']
     
     paramString = name_array[j]
     x_axis_name = 'Generation'

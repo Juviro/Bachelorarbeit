@@ -17,13 +17,14 @@ public class NegamaxAI {
 
     private int current_max_depth = 7;
     public int numberOfVisitedNodes = 0;
-    private LinkedList<Move> bestMoves = new LinkedList<>();
+    public int numberOfRatedStates = 0;
+    public LinkedList<Move> bestMoves = new LinkedList<>();
 
     private AISettings settings;
 
     public long timeTotal;
     private long timeStarted;
-    private long timeRemaining;
+    public long timeRemaining;
     private int activePlayer;
     private Ratings ratings;
 
@@ -48,7 +49,7 @@ public class NegamaxAI {
             // Adjust the current current_max_depth based on the time used already and the time remaining.
             setMaxDepth(timeRemaining, state.turn);
         } else {
-            current_max_depth = 5;
+            current_max_depth = 6;
         }
 
         // Perform the search for the best move with the negamax algorithm.
@@ -68,7 +69,7 @@ public class NegamaxAI {
      * @param beta beta, only if alpha beta pruning is enabled
      * @return current heuristic rating
      */
-    private double negamax(GameState state, int depth, double alpha, double beta) {
+    public double negamax(GameState state, int depth, double alpha, double beta) {
         numberOfVisitedNodes++;
         int color = state.activePlayer;
 
@@ -84,7 +85,8 @@ public class NegamaxAI {
         // Rate if we found our depth goal.
         // If the last move was a capture move and quiescence search is enabled, perform another iteration instead (maximum five times to not go too deep).
         if ((depth <= 0 && !(state.lastMove.isCaptureMove && settings.quiescenceEnabled)) || depth < -4) {
-            return ratings.rateState(state, color);
+            numberOfRatedStates++;
+            return ratings.rateState(state, color, color == activePlayer);
         }
 
         double bestValue = Double.NEGATIVE_INFINITY;
@@ -100,12 +102,6 @@ public class NegamaxAI {
                 v = -negamax(state.executeMove(move), depth - 1, -beta, -alpha);
             } else {
                 v = negamax(state.executeMove(move), depth - 1, alpha, beta);
-            }
-
-            // captureMoves are nearly always better, therefor they weight more
-            if (move.isCaptureMove && depth == current_max_depth) {
-                double multiplier = (activePlayer == color ? 1.5 : 0.5);
-                v *= multiplier;
             }
 
             // save all equally rated moves to make the movement choice non-deterministic

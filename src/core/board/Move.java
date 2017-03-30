@@ -51,11 +51,13 @@ public class Move {
     @Override
     public String toString() {
         return "Move{" +
-                "positionFrom = " + positionFrom +
-                ", positionTo = " + positionTo +
+                "positionFrom = " + Parser.positionToString(positionFrom) +
+                ", positionTo = " + Parser.positionToString(positionTo) +
                 ", direction = " + direction +
                 ", affectedBullets = " + affectedBullets +
                 ", isCaptureMove = " + isCaptureMove +
+                ", positionFrom = " + positionFrom +
+                ", positionTo = " + positionTo +
                 '}';
     }
 }

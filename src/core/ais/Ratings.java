@@ -5,43 +5,41 @@ import core.board.GameState;
 public class Ratings {
 
     /**
-     * weights to easily adjust the influence of the different rating forms
+     * weights to easily adjust the influence of the different rating parameters
      */
-    private double[] weights = {1, 0.5, 1, 0.5, 0.5, 1};
+    private double[] weights = {1, 0.5, 1, 1, 0.5, 1, 0};
     private static final int PLAYER_MULTIPLIER = 0;
     private static final int PREDOMINANCE_MULTIPLIER = 1;
     private static final int PLACEMENT_RATING_MULTIPLIER = 2;
-    private static final int STICK_RATING_MULTIPLIER = 3;
+    private static final int ACTIVE_PLAYER_RATING = 3;
     private static final int CENTER_OF_MASS_MULTIPLIER = 4;
     private static final int LIBERTY_RATING_MULTIPLIER = 5;
+    private static final int STICK_RATING_MULTIPLIER = 6;
 
     Ratings(double[] weights) {
         this.weights = weights;
     }
 
     /**
-     * bullet rating
-     * bullet predominance
-     * edge rating
-     * stick to last red bullet rating
-     *
      * @param state current gameState
      * @param color color of the active player
+     * @param activePLayersTurn true if the currently active player is also the player that's active at the root node
      * @return heuristic rating value
      */
-    double rateState(GameState state, int color) {
+    double rateState(GameState state, int color, boolean activePLayersTurn) {
         int enemyColor = ((color + 1) % 2) + 2;
         // get all the different ratings
         double redBulletRating = (weights[PLAYER_MULTIPLIER] != 0 ? bulletRating(state, color) : 0);
         double bulletPredominance = (weights[PREDOMINANCE_MULTIPLIER] != 0 ? bulletPredominance(state.bitmaps, color) : 0);
         double placementRating = (weights[PLACEMENT_RATING_MULTIPLIER] != 0 ? bulletPlacementRating(state.bitmaps[color], state.bitmaps[enemyColor]) : 0);
-        double stickRating = (weights[STICK_RATING_MULTIPLIER] != 0 ? stickToLastBullet(state.bitmaps, color) : 0);
+        double activePlayerRating = (activePLayersTurn ? weights[ACTIVE_PLAYER_RATING] : - weights[ACTIVE_PLAYER_RATING]);
         double centerOfMassRating = (weights[CENTER_OF_MASS_MULTIPLIER] != 0 ? centerOfMass(state.bitmaps[color], state.bitmaps[enemyColor]) : 0);
         double libertyRating = (weights[LIBERTY_RATING_MULTIPLIER] != 0 ? bulletLibertyRating(state.bitmaps, color, enemyColor) : 0);
+        double stickRating = 0; //(weights[STICK_RATING_MULTIPLIER] != 0 ? stickToLastBullet(state.bitmaps, color, enemyColor) : 0);
 
 
         // weight and add them
-        return redBulletRating * weights[PLAYER_MULTIPLIER] + bulletPredominance * weights[PREDOMINANCE_MULTIPLIER] + placementRating * weights[PLACEMENT_RATING_MULTIPLIER] + stickRating * weights[STICK_RATING_MULTIPLIER] + centerOfMassRating * weights[CENTER_OF_MASS_MULTIPLIER] + libertyRating * weights[LIBERTY_RATING_MULTIPLIER];
+        return redBulletRating * weights[PLAYER_MULTIPLIER] + bulletPredominance * weights[PREDOMINANCE_MULTIPLIER] + placementRating * weights[PLACEMENT_RATING_MULTIPLIER] + /*stickRating * weights[STICK_RATING_MULTIPLIER] + */centerOfMassRating * weights[CENTER_OF_MASS_MULTIPLIER] + libertyRating * weights[LIBERTY_RATING_MULTIPLIER] + activePlayerRating;
     }
 
     /**
@@ -77,7 +75,7 @@ public class Ratings {
      * 1 2 2 2 2 2 1
      * 1 1 1 1 1 1 1
      *
-     * @param ownBitmap bitmap board representation of the active player
+     * @param ownBitmap bitmap board representation of  the active player
      * @param enemyBitboard bitmap board representation of the inactive player
      * @return rating of own Bullets / (number of own bullets * 1.5) - rating of enemy Bullets / (number of enemy bullets * 1.5)
      */
@@ -184,16 +182,20 @@ public class Ratings {
      * If only one bullet remains, make sure to place an own bullet next to it.
      * @param bitmaps board representations
      * @param color active player
-     * @return 0 if there is more than 1 red bullet, -1 if no [color] bullet is right next to the last red bullet, and 1 if at least one is.
+     * @param enemyColor inactive player
+     * @return 0 if there is more than 1 red bullet, 1 if only the active player has a bullet next to the red one, -1 if only the inactive player has a bullet next to it
      */
-    private static double stickToLastBullet(long[] bitmaps, int color) {
+    private static double stickToLastBullet(long[] bitmaps, int color, int enemyColor) {
+        double rating = 0;
         if (Long.bitCount(bitmaps[1]) == 1) {
             if (isNeighbor(bitmaps[1], bitmaps[color])) {
-                return 1;
+                rating += 1;
             }
-            return -1;
+            if (isNeighbor(bitmaps[1], bitmaps[enemyColor])) {
+                rating -= 1;
+            }
         }
-        return 0;
+        return rating;
     }
 
     /**

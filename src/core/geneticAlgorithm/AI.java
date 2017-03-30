@@ -15,6 +15,7 @@ class AI implements Comparable<AI> {
     private double[] weights = new double[6];
     private aiType aitype;
     private AISettings aiSettings;
+    private int gamesWonSoFar = 0;
 
     /*
     // TODO überarbeiten
@@ -29,15 +30,27 @@ class AI implements Comparable<AI> {
     }
 
 
-    AI(double redBulletRating, double bulletPredominance, double placementRating, double stickRating, double massRating, double libertyRating, aiType aitype) {
+    AI(double redBulletRating, double bulletPredominance, double placementRating, double turnRating, double massRating, double libertyRating, aiType aitype) {
         this.weights[0] = redBulletRating;
         this.weights[1] = bulletPredominance;
         this.weights[2] = placementRating;
-        this.weights[3] = stickRating;
+        this.weights[3] = turnRating;
         this.weights[4] = massRating;
         this.weights[5] = libertyRating;
         this.aiSettings = new AISettings(true, true, true, true, weights);
         this.aitype = aitype;
+    }
+
+    AI(double redBulletRating, double bulletPredominance, double placementRating, double turnRating, double massRating, double libertyRating, aiType aitype, int gamesWonSoFar) {
+        this.weights[0] = redBulletRating;
+        this.weights[1] = bulletPredominance;
+        this.weights[2] = placementRating;
+        this.weights[3] = turnRating;
+        this.weights[4] = massRating;
+        this.weights[5] = libertyRating;
+        this.aiSettings = new AISettings(true, true, true, true, weights);
+        this.aitype = aitype;
+        this.gamesWonSoFar = gamesWonSoFar;
     }
 
     void setResults(boolean gameWon, int redBulletDifference, int bulletDifference) {
@@ -74,6 +87,15 @@ class AI implements Comparable<AI> {
         return aitype;
     }
 
+    int getGamesWonSoFar() {
+        return gamesWonSoFar;
+    }
+
+    void increaseNUmberOfWins() {
+        gamesWonSoFar++;
+    }
+
+
     /**
      * Calculates the fitness for the AI.
      * The fitness is a value between 0 and 1 and consists of 80% win-rate, 10% bullet difference and 10% red bullet difference.
@@ -108,11 +130,12 @@ class AI implements Comparable<AI> {
     public String toString() {
         return "AI{" +
                 "fitness=" + getFitness() +
-                "numberOfWins=" + numberOfWins +
+                ", numberOfWins=" + numberOfWins +
                 ", averageBulletDifference=" + averageBulletDifference +
                 ", averageRedBulletDifference=" + averageRedBulletDifference +
                 ", weights=" + Arrays.toString(weights) +
                 ", aitype=" + aitype +
+                ", gamesWonSoFar=" + gamesWonSoFar +
                 '}';
     }
 }

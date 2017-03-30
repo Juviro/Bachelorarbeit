@@ -16,7 +16,7 @@ Player;white;black
 Games won total;5;5
 Games won percent;0.5;0.5
 Time used/game;2759;17568
-Nodes visited/gamed;10291575;54124648
+Nodes visited/gamed;10.291.575;54.124.648
 alphaBetaPruningEnabled;false;true
 moveSortEnabled;false;true
 quiescenceEnabled;false;true

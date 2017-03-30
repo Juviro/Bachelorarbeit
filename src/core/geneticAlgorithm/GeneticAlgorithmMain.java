@@ -21,7 +21,7 @@ public class GeneticAlgorithmMain {
      */
     private static void processGames() {
         setWeights();
-        fixParam(0);
+        //fixParam(0);
         AIs = Tournament.playTournament(AIs);
         saveGenerationLog();
         AIs.forEach(System.out::println);
@@ -67,11 +67,13 @@ public class GeneticAlgorithmMain {
             String parent1 = br.readLine();
             String parent2 = br.readLine();
 
-            double[] weightsParent1 = Arrays.stream(Arrays.copyOfRange(parent1.split(";"), 5, 11)).mapToDouble(Double::parseDouble).toArray();
-            double[] weightsParent2 = Arrays.stream(Arrays.copyOfRange(parent2.split(";"), 5, 11)).mapToDouble(Double::parseDouble).toArray();
+            double[] weightsParent1 = Arrays.stream(Arrays.copyOfRange(parent1.split(";"), 5, 12)).mapToDouble(Double::parseDouble).toArray();
+            double[] weightsParent2 = Arrays.stream(Arrays.copyOfRange(parent2.split(";"), 5, 12)).mapToDouble(Double::parseDouble).toArray();
 
-            AIs.add(new AI(weightsParent1[0],weightsParent1[1], weightsParent1[2], weightsParent1[3], weightsParent1[4], weightsParent1[5], AI.aiType.parentAI));
-            AIs.add(new AI(weightsParent2[0],weightsParent2[1], weightsParent2[2], weightsParent2[3], weightsParent2[4], weightsParent2[5], AI.aiType.parentAI));
+            AIs.add(new AI(weightsParent1[0],weightsParent1[1], weightsParent1[2], weightsParent1[3], weightsParent1[4], weightsParent1[5], AI.aiType.parentAI, (int) weightsParent1[6]));
+            AIs.add(new AI(weightsParent2[0],weightsParent2[1], weightsParent2[2], weightsParent2[3], weightsParent2[4], weightsParent2[5], AI.aiType.parentAI, (int) weightsParent2[6]));
+
+            System.out.println(AIs.getFirst().toString());
 
             crossoverParents(weightsParent1, weightsParent2);
             mutateParents(weightsParent1, weightsParent2);
@@ -97,7 +99,6 @@ public class GeneticAlgorithmMain {
         int param2 = 0;
 
         // create random numbers that indicate which ai gets their parameters from which ai
-        // TODO
         while (param1 == param2) {
             param1 = (int) (Math.random() * 4);
             param2 = (int) (Math.random() * 4);
@@ -196,6 +197,7 @@ public class GeneticAlgorithmMain {
     public static double mutateDouble(double d, double mutationRate) {
         // make sure the mutationRate is between 0 and 0.15
         mutationRate = Math.max(Math.min(mutationRate, 0.15), 0);
+        mutationRate *= .5;
         d += 511;
         long mutant = (long) d;
         long position = 0b1000000000L;
@@ -234,15 +236,17 @@ public class GeneticAlgorithmMain {
      */
     private static String createLog() {
         Collections.sort(AIs, Collections.reverseOrder());
-        String gameLog = "fitness;aiType;gamesWon;averageRedBulletDifference;averageBulletDifference;redBulletRating;bulletPredominanceRating;placementRating;stickRating;massRating;libertyRating\n";
+        AIs.getFirst().increaseNUmberOfWins();
+        String gameLog = "fitness;aiType;gamesWon;averageRedBulletDifference;averageBulletDifference;redBulletRating;bulletPredominanceRating;placementRating;turnRating;massRating;libertyRating;gamesWonSoFar\n";
         for (AI ai : AIs) {
             double redBulletRating = ai.getWeights()[0];
             double bulletPredominanceRating = ai.getWeights()[1];
             double placementRating = ai.getWeights()[2];
-            double stickRating = ai.getWeights()[3];
+            double turnRating = ai.getWeights()[3];
             double massRating = ai.getWeights()[4];
             double libertyRating = ai.getWeights()[5];
-            gameLog += ai.getFitness() + ";" + ai.getAitype() + ";" + ai.getNumberOfWins() + ";" + ai.getAverageRedBulletDifference() + ";" + ai.getAverageBulletRate() + ";" + redBulletRating + ";" + bulletPredominanceRating + ";" + placementRating + ";" + stickRating  + ";" + massRating + ";" + libertyRating + "\n";
+            double gamesWonSoFar = ai.getGamesWonSoFar();
+            gameLog += ai.getFitness() + ";" + ai.getAitype() + ";" + ai.getNumberOfWins() + ";" + ai.getAverageRedBulletDifference() + ";" + ai.getAverageBulletRate() + ";" + redBulletRating + ";" + bulletPredominanceRating + ";" + placementRating + ";" + turnRating  + ";" + massRating + ";" + libertyRating + ";" + gamesWonSoFar + "\n";
         }
         return gameLog;
     }
@@ -255,10 +259,10 @@ public class GeneticAlgorithmMain {
             double redBulletRating = Math.random() * 1023 - 511;
             double bulletPredominance = Math.random() * 1023 - 511;
             double placementRating = Math.random() * 1023 - 511;
-            double stickRating = Math.random() * 1023 - 511;
+            double turnRating = Math.random() * 1023 - 511;
             double massRating = Math.random() * 1023 - 511;
             double libertyRating = Math.random() * 1023 - 511;
-            AI ai = new AI(redBulletRating, bulletPredominance, placementRating, stickRating, massRating, libertyRating, AI.aiType.randomAI);
+            AI ai = new AI(redBulletRating, bulletPredominance, placementRating, turnRating, massRating, libertyRating, AI.aiType.randomAI);
             AIs.add(ai);
         }
     }
