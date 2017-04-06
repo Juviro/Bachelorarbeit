@@ -3,6 +3,7 @@ package core.ais;
 import core.board.GameState;
 import core.board.Move;
 
+import java.lang.reflect.Array;
 import java.util.LinkedList;
 
 import static java.lang.Double.max;
@@ -24,7 +25,7 @@ public class NegamaxAI {
 
     public long timeTotal;
     private long timeStarted;
-    public long timeRemaining;
+    private long timeRemaining;
     private int activePlayer;
     private Ratings ratings;
 
@@ -35,6 +36,7 @@ public class NegamaxAI {
 
 
     public GameState performMove(GameState state, long timeRemaining) {
+
         activePlayer = state.activePlayer;
         this.timeRemaining = timeRemaining;
 
@@ -53,10 +55,14 @@ public class NegamaxAI {
         }
 
         // Perform the search for the best move with the negamax algorithm.
+        //System.out.println(negamax(state, current_max_depth, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY));
+
         negamax(state, current_max_depth, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+
 
         // Take a random move from all of the equal best moves.
         Move bestMove = bestMoves.get((int) (Math.random() * bestMoves.size()));
+        //System.out.println(bestMove.toString());
         return state.executeMove(bestMove);
     }
 
@@ -76,15 +82,15 @@ public class NegamaxAI {
         // If the game is over, return a high value. This value is increased based on how deep we're currently.
         if (state.gameWinner != -1) {
             if (state.gameWinner == color) {
-                return 100000 + depth * 10000;
+                return 1000000000 + depth * 1000;
             } else {
-                return -(100000 + depth * 10000);
+                return -(1000000000 + depth * 1000);
             }
         }
 
         // Rate if we found our depth goal.
-        // If the last move was a capture move and quiescence search is enabled, perform another iteration instead (maximum five times to not go too deep).
-        if ((depth <= 0 && !(state.lastMove.isCaptureMove && settings.quiescenceEnabled)) || depth < -4) {
+        // If the last move was a capture move and quiescence search is enabled, perform another iteration instead (maximum four times to not go too deep).
+        if ((depth <= 0 && !(state.lastMove.isCaptureMove && settings.quiescenceEnabled)) || depth < -5) {
             numberOfRatedStates++;
             return ratings.rateState(state, color, color == activePlayer);
         }
@@ -140,13 +146,15 @@ public class NegamaxAI {
         double percentageTimeUsed = 1 - ((double) timeRemaining / (double) timeTotal);
         double estimatedTurnPercentage = min((double) turn / (double) AVERAGE_TURNS_PER_GAME, 1);
 
-        if (percentageTimeUsed > 0.995) {
+        if (turn < 6) {
+            current_max_depth = turn + 1;
+        } else if (percentageTimeUsed > 0.995) {
             current_max_depth = 5;
         } else if (percentageTimeUsed > 0.98) {
             current_max_depth = 6;
         } else if (percentageTimeUsed > 0.9) {
             current_max_depth = 7;
-        } else if (percentageTimeUsed < estimatedTurnPercentage * 0.9 && current_max_depth < 9) {
+        } else if (percentageTimeUsed < estimatedTurnPercentage * 0.9 && current_max_depth < 8) {
             current_max_depth++;
         } else if (percentageTimeUsed > estimatedTurnPercentage && current_max_depth > 8) {
             current_max_depth--;

@@ -6,7 +6,7 @@ public class AISettings {
     public boolean moveSortEnabled;
     public boolean timeManagementEnabled;
     public boolean quiescenceEnabled;
-    double[] weights;
+    public double[] weights;
 
     public AISettings(boolean alphaBetaPruningEnabled, boolean moveSortEnabled, boolean timeManagementEnabled, boolean quiescenceEnabled, double[] weights) {
         this.alphaBetaPruningEnabled = alphaBetaPruningEnabled;

@@ -2,6 +2,9 @@ package core.ais;
 
 import core.board.GameState;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+
 public class Ratings {
 
     /**
@@ -29,17 +32,16 @@ public class Ratings {
     double rateState(GameState state, int color, boolean activePLayersTurn) {
         int enemyColor = ((color + 1) % 2) + 2;
         // get all the different ratings
-        double redBulletRating = (weights[PLAYER_MULTIPLIER] != 0 ? bulletRating(state, color) : 0);
-        double bulletPredominance = (weights[PREDOMINANCE_MULTIPLIER] != 0 ? bulletPredominance(state.bitmaps, color) : 0);
-        double placementRating = (weights[PLACEMENT_RATING_MULTIPLIER] != 0 ? bulletPlacementRating(state.bitmaps[color], state.bitmaps[enemyColor]) : 0);
+        double redBulletRating = (weights[PLAYER_MULTIPLIER] != 0 ? weights[PLAYER_MULTIPLIER] * bulletRating(state, color) : 0);
+        double bulletPredominance = (weights[PREDOMINANCE_MULTIPLIER] != 0 ? weights[PREDOMINANCE_MULTIPLIER] * bulletPredominance(state.bitmaps, color) : 0);
+        double placementRating = (weights[PLACEMENT_RATING_MULTIPLIER] != 0 ? weights[PLACEMENT_RATING_MULTIPLIER] *  bulletPlacementRating(state.bitmaps[color], state.bitmaps[enemyColor]) : 0);
         double activePlayerRating = (activePLayersTurn ? weights[ACTIVE_PLAYER_RATING] : - weights[ACTIVE_PLAYER_RATING]);
-        double centerOfMassRating = (weights[CENTER_OF_MASS_MULTIPLIER] != 0 ? centerOfMass(state.bitmaps[color], state.bitmaps[enemyColor]) : 0);
-        double libertyRating = (weights[LIBERTY_RATING_MULTIPLIER] != 0 ? bulletLibertyRating(state.bitmaps, color, enemyColor) : 0);
-        double stickRating = 0; //(weights[STICK_RATING_MULTIPLIER] != 0 ? stickToLastBullet(state.bitmaps, color, enemyColor) : 0);
+        double centerOfMassRating = (weights[CENTER_OF_MASS_MULTIPLIER] != 0 ? weights[CENTER_OF_MASS_MULTIPLIER] * centerOfMass(state.bitmaps[color], state.bitmaps[enemyColor]) : 0);
+        double libertyRating = (weights[LIBERTY_RATING_MULTIPLIER] != 0 ? weights[LIBERTY_RATING_MULTIPLIER] * bulletLibertyRating(state.bitmaps, color, enemyColor) : 0);
 
 
         // weight and add them
-        return redBulletRating * weights[PLAYER_MULTIPLIER] + bulletPredominance * weights[PREDOMINANCE_MULTIPLIER] + placementRating * weights[PLACEMENT_RATING_MULTIPLIER] + /*stickRating * weights[STICK_RATING_MULTIPLIER] + */centerOfMassRating * weights[CENTER_OF_MASS_MULTIPLIER] + libertyRating * weights[LIBERTY_RATING_MULTIPLIER] + activePlayerRating;
+        return redBulletRating + bulletPredominance + placementRating + /*stickRating * weights[STICK_RATING_MULTIPLIER] + */centerOfMassRating + libertyRating + activePlayerRating;
     }
 
     /**
@@ -47,7 +49,7 @@ public class Ratings {
      * @param color current player
      * @return difference between captured red bullets by white and black.
      */
-    private static int bulletRating(GameState state, int color) {
+    public static int bulletRating(GameState state, int color) {
         int playerMultiplier = (color == 2 ? 1 : -1);
         return (state.capturedBulletsWhite - state.capturedBulletsBlack) * playerMultiplier;
     }
@@ -77,7 +79,7 @@ public class Ratings {
      *
      * @param ownBitmap bitmap board representation of  the active player
      * @param enemyBitboard bitmap board representation of the inactive player
-     * @return rating of own Bullets / (number of own bullets * 1.5) - rating of enemy Bullets / (number of enemy bullets * 1.5)
+     * @return (rating of own Bullets / (number of own bullets * 1.5) - rating of enemy Bullets / (number of enemy bullets * 1.5)) * 5
      */
 
     private static double bulletPlacementRating(long ownBitmap, long enemyBitboard) {
@@ -97,7 +99,7 @@ public class Ratings {
         numberOfBullets = Long.bitCount(enemyBitboard);
         double enemyBoardRating = (double) (bulletsOnRankOne + bulletsOnRankTwo * 2 + bulletsOnRankThree * 3) / (numberOfBullets * 1.5);
 
-        return ownBoardRating - enemyBoardRating;
+        return (ownBoardRating - enemyBoardRating) * 5;
     }
 
     /**
@@ -171,6 +173,10 @@ public class Ratings {
             }
         }
 
+
+        if (numberOfOwnBullets <= 0 || numberOfEnemyBullets <= 0) {
+            System.out.println(Arrays.toString(bitmaps));
+        }
         double ownPercentage = numberOfOwnBulletsWithLiberties / numberOfOwnBullets;
         double enemyPercentage = numberOfEnemyBulletsWithLiberties / numberOfEnemyBullets;
 

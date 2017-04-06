@@ -3,6 +3,7 @@ package core.geneticAlgorithm;
 import core.ais.AISettings;
 import core.gameenvironment.GameProcessor;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
 class Tournament {

@@ -26,7 +26,7 @@ class AI implements Comparable<AI> {
      mutantOther: mutation of AIs from the last generation that did not win.
       */
     enum aiType {
-        randomAI, parentAI, childAI, childAIMutated, parentAIMutated, mutantOther
+        randomAI, parentAI, childAI, childAIMutated, parentAIMutated, mutantOther, thrownIn
     }
 
 
@@ -94,7 +94,6 @@ class AI implements Comparable<AI> {
     void increaseNUmberOfWins() {
         gamesWonSoFar++;
     }
-
 
     /**
      * Calculates the fitness for the AI.

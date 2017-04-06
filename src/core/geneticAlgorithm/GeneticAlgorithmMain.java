@@ -10,6 +10,7 @@ public class GeneticAlgorithmMain {
     private static LinkedList<AI> AIs = new LinkedList<>();
     private static int lastGameFileIndex = 0;
 
+    private static boolean throwInDone = false;
 
     public static void main (String[] args) {
         processGames();
@@ -22,11 +23,27 @@ public class GeneticAlgorithmMain {
     private static void processGames() {
         setWeights();
         //fixParam(0);
+        if (!throwInDone){
+            throwInAI();
+            throwInDone = true;
+        }
         AIs = Tournament.playTournament(AIs);
         saveGenerationLog();
         AIs.forEach(System.out::println);
         AIs = new LinkedList<>();
         processGames();
+    }
+
+    private static void throwInAI() {
+        AIs.remove(7);
+        double redBulletRating = 367;
+        double bulletPredominance = 215;
+        double placementRating = 303;
+        double turnRating = 1;
+        double massRating = 135;
+        double libertyRating = 150;
+        AI ai = new AI(redBulletRating, bulletPredominance, placementRating, turnRating, massRating, libertyRating, AI.aiType.thrownIn);
+        AIs.add(ai);
     }
 
 
@@ -73,7 +90,6 @@ public class GeneticAlgorithmMain {
             AIs.add(new AI(weightsParent1[0],weightsParent1[1], weightsParent1[2], weightsParent1[3], weightsParent1[4], weightsParent1[5], AI.aiType.parentAI, (int) weightsParent1[6]));
             AIs.add(new AI(weightsParent2[0],weightsParent2[1], weightsParent2[2], weightsParent2[3], weightsParent2[4], weightsParent2[5], AI.aiType.parentAI, (int) weightsParent2[6]));
 
-            System.out.println(AIs.getFirst().toString());
 
             crossoverParents(weightsParent1, weightsParent2);
             mutateParents(weightsParent1, weightsParent2);
@@ -181,6 +197,7 @@ public class GeneticAlgorithmMain {
         }
 
         AIs.add(new AI(ai1[0],ai1[1], ai1[2], ai1[3], ai1[4], ai1[5], AI.aiType.mutantOther));
+        //AIs.add(new AI(100, 100, 100, 100, 100, 100, AI.aiType.randomAI));
         AIs.add(new AI(ai2[0],ai2[1], ai2[2], ai2[3], ai2[4], ai2[5], AI.aiType.mutantOther));
     }
 
@@ -197,7 +214,7 @@ public class GeneticAlgorithmMain {
     public static double mutateDouble(double d, double mutationRate) {
         // make sure the mutationRate is between 0 and 0.15
         mutationRate = Math.max(Math.min(mutationRate, 0.15), 0);
-        mutationRate *= .5;
+        //mutationRate *= .5;
         d += 511;
         long mutant = (long) d;
         long position = 0b1000000000L;
@@ -236,7 +253,8 @@ public class GeneticAlgorithmMain {
      */
     private static String createLog() {
         Collections.sort(AIs, Collections.reverseOrder());
-        AIs.getFirst().increaseNUmberOfWins();
+        AIs.get(0).increaseNUmberOfWins();
+        AIs.get(1).increaseNUmberOfWins();
         String gameLog = "fitness;aiType;gamesWon;averageRedBulletDifference;averageBulletDifference;redBulletRating;bulletPredominanceRating;placementRating;turnRating;massRating;libertyRating;gamesWonSoFar\n";
         for (AI ai : AIs) {
             double redBulletRating = ai.getWeights()[0];

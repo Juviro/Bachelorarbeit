@@ -76,7 +76,7 @@ public class Parser {
         return string;
     }
 
-    public static String positionToString(long position) {
+    static String positionToString(long position) {
         String string = "";
         switch((Long.numberOfLeadingZeros(position) - 15) % 7){
             case 0: string += "a";break;

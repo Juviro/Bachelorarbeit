@@ -147,7 +147,7 @@ public class GameState {
             currentPosition = shift(currentPosition, move.direction);
             colorOfLastBullet = colorOfCurrentBullet;
         }
-        // Check win conditions (7 red bullets captured or enemy doesn't have bullets on the core.board remaining).
+        // Check win conditions (7 red bullets captured or enemy doesn't have bullets on the board remaining).
         if (newState.capturedBulletsBlack > 6 || newState.capturedBulletsWhite > 6 || newState.bitmaps[2] == 0  || newState.bitmaps[3] == 0) {
             newState.gameWinner = ((newState.capturedBulletsBlack > 6 || newState.bitmaps[2] == 0) ? 3 : 2);
         }
@@ -369,6 +369,7 @@ public class GameState {
         System.out.println("capturedBulletsBlack = " + capturedBulletsBlack);
         System.out.println("activePlayer = " + activePlayer);
         System.out.println("gameWinner = " + gameWinner);
+        System.out.println("turn = " + turn);
         if (lastMove != null) {
             System.out.println("lastMove = " + lastMove.toString());
         }

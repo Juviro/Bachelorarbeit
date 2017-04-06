@@ -62,16 +62,6 @@ public class GameProcessor {
             if (logGames) {
                 logState(gameState);
             }
-//            if (gameState.turn > 200) {
-//                break;
-//            }
-            for (int i = 0; i < 4; i++) {
-                if (Long.numberOfLeadingZeros(gameState.bitmaps[i]) < 15) {
-                    System.out.println(i);
-                    System.out.println(gameState.bitmaps[i]);
-                    gameState.printField();
-                }
-            }
         }
 
         if (logGames) {
@@ -82,6 +72,7 @@ public class GameProcessor {
         winner = gameState.gameWinner;
         System.out.println("Player " + winner + " won game " + gameNumber + "!");
     }
+
 
     /**
      * Performs a move and updates the remaining time.
@@ -111,8 +102,12 @@ public class GameProcessor {
         // Check if a player has run out of time.
         if (timeRemainingWhite < 0) {
             newGameState.gameWinner = 3;
+            //newGameState.printStats();
+            //System.out.println("white lost via time");
         } else if (timeRemainingBlack < 0) {
             newGameState.gameWinner = 2;
+//            newGameState.printStats();
+//            System.out.println("black lost via time");
         }
 
         return newGameState;

@@ -12,17 +12,20 @@ import java.io.IOException;
 public class PerformanceComparison {
 
     public static void main (String[] args) {
-        int numberOfGames = 100;
+        int numberOfGames = 10;
+        String startingSetup;// = "2200033220103300111000111110001110033010223300022";
+        startingSetup = "0100130201300000000211111300000020010303101000000";
 
-        AISettings settingsWhite = new AISettings(true, true, true, true);
-        AISettings settingsBlack = new AISettings(true, true, true, true);
-        //AISettings settingsBlack = new AISettings(true, true, true, true, new double[]{367., 215., 303., 0., 135., 150.});
+        //AISettings settingsWhite = new AISettings(true, true, true, true);
+        //AISettings settingsBlack = new AISettings(true, true, true, true);
+        AISettings settingsWhite = new AISettings(true, true, true, true, new double[]{343., 145., 60., 428., 317., 440.});
+        AISettings settingsBlack = new AISettings(true, true, true, true, new double[]{343., 145., 60., 0, 317., 440.});
 
-        compareAIs(settingsWhite, settingsBlack, numberOfGames, true);
+        compareAIs(settingsWhite, settingsBlack, numberOfGames, true, startingSetup);
     }
 
 
-    private static void compareAIs (AISettings settingsWhite, AISettings settingsBlack, int numberOfGames, boolean whiteStarts) {
+    private static void compareAIs (AISettings settingsWhite, AISettings settingsBlack, int numberOfGames, boolean whiteStarts, String startingSetup) {
 
         int wonGamesWhite = 0;
         int wonGamesBlack = 0;
@@ -31,7 +34,6 @@ public class PerformanceComparison {
         int numberOfVisitedNodesWhite = 0;
         int numberOfVisitedNodesBlack = 0;
         int turns = 0;
-        String startingSetup = "2200033220103300111000111110001110033010223300022";
         long gameTime = 20000;
         String gameLog = "Game number;turns;winner;captured bullets white;captured bullets black;remaining bullets white; remaining bullets black;time remaining white; time remaining black; nodes visited white; nodes visited black\n";
         for (int i = 0; i < numberOfGames; i++) {

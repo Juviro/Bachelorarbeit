@@ -133,4 +133,13 @@ public class RatingsTest {
         System.out.println("aiEnabled.bestMoves = " + aiEnabled.bestMoves);
         System.out.println("aiDisabled.bestMoves = " + aiDisabled.bestMoves);
     }
+
+    @Test
+    public void test() {
+        String startingSetup = "2200033220103300111000111110001110033010223300022";
+        long[] bitboards = Parser.stringToBitboard(startingSetup);
+        for (long l: bitboards) {
+            System.out.println(Long.toBinaryString(l));
+        }
+    }
 }
