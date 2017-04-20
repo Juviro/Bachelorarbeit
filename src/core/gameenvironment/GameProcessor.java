@@ -103,11 +103,11 @@ public class GameProcessor {
         if (timeRemainingWhite < 0) {
             newGameState.gameWinner = 3;
             //newGameState.printStats();
-            //System.out.println("white lost via time");
+            System.out.println("white lost via time");
         } else if (timeRemainingBlack < 0) {
             newGameState.gameWinner = 2;
-//            newGameState.printStats();
-//            System.out.println("black lost via time");
+            //newGameState.printStats();
+            System.out.println("black lost via time");
         }
 
         return newGameState;

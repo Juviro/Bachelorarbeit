@@ -3,6 +3,7 @@ package core.geneticAlgorithm;
 
 import core.ais.AISettings;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 
 class AI implements Comparable<AI> {
@@ -17,14 +18,6 @@ class AI implements Comparable<AI> {
     private AISettings aiSettings;
     private int gamesWonSoFar = 0;
 
-    /*
-    // TODO überarbeiten
-     Enum to distinguish the different AI types.
-     randomAI: completely random values, only appears in the very first generation.
-     parentAI: the AIs with the highest fitness from the last generation.
-     mutantWinner: mutations of the parentAIs.
-     mutantOther: mutation of AIs from the last generation that did not win.
-      */
     enum aiType {
         randomAI, parentAI, childAI, childAIMutated, parentAIMutated, mutantOther, thrownIn
     }
@@ -51,6 +44,12 @@ class AI implements Comparable<AI> {
         this.aiSettings = new AISettings(true, true, true, true, weights);
         this.aitype = aitype;
         this.gamesWonSoFar = gamesWonSoFar;
+    }
+
+    AI(double[] weights, aiType aitype) {
+        this.weights = weights;
+        this.aiSettings = new AISettings(true, true, true, true, weights);
+        this.aitype = aitype;
     }
 
     void setResults(boolean gameWon, int redBulletDifference, int bulletDifference) {
@@ -125,13 +124,16 @@ class AI implements Comparable<AI> {
         }
     }
 
+
+    DecimalFormat df = new DecimalFormat("#.##");
+
     @Override
     public String toString() {
         return "AI{" +
-                "fitness=" + getFitness() +
+                "fitness=" + df.format(getFitness()) +
                 ", numberOfWins=" + numberOfWins +
-                ", averageBulletDifference=" + averageBulletDifference +
-                ", averageRedBulletDifference=" + averageRedBulletDifference +
+                ", averageBulletDifference=" + df.format(averageBulletDifference) +
+                ", averageRedBulletDifference=" + df.format(averageRedBulletDifference) +
                 ", weights=" + Arrays.toString(weights) +
                 ", aitype=" + aitype +
                 ", gamesWonSoFar=" + gamesWonSoFar +

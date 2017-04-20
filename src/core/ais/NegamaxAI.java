@@ -16,7 +16,7 @@ import static java.lang.Double.min;
 public class NegamaxAI {
     private static final int AVERAGE_TURNS_PER_GAME = 60;
 
-    private int current_max_depth = 7;
+    private int current_max_depth = 6;
     public int numberOfVisitedNodes = 0;
     public int numberOfRatedStates = 0;
     public LinkedList<Move> bestMoves = new LinkedList<>();
@@ -50,14 +50,11 @@ public class NegamaxAI {
             timeStarted = System.currentTimeMillis();
             // Adjust the current current_max_depth based on the time used already and the time remaining.
             setMaxDepth(timeRemaining, state.turn);
-        } else {
-            current_max_depth = 6;
         }
 
         // Perform the search for the best move with the negamax algorithm.
-        //System.out.println(negamax(state, current_max_depth, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY));
 
-        negamax(state, current_max_depth, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+        double result = negamax(state, current_max_depth, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
 
         // Take a random move from all of the equal best moves.
